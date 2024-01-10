@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+
+{% block contenido %} 
+    <h1>Crear un Nuevo Platillo</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary" type="submit">Guardar</button>
+      <a href ="{% url 'Menu' %}"class="btn btn-danger" type="submit">Cancelar</a> 
+    </form>
+    {% if form.errors %}
+      <div class="errors">
+          {{ form.errors }}
+      </div>
+  {% endif %}
+{% endblock %}

@@ -71,22 +71,34 @@
 
         <div class="row">
             {% for Producto in Producto %}
-                <div class="col-sm-3">
-                    <div class="card" style="width: 18rem;" >
+                <div class="col-sm-3 " style= "max-height: 550px; overflow-y: auto;">
+                    <div class="card" style="width: 18rem; position: relative;">
                         <img src="{{ Producto.imagen.url}}" class="card-img-top" style="width: 100%; height:150px; " alt="...">
                         <div class="card-body">
                             <h5 class="card-title">{{ Producto.nombre }}</h5>
                             <p class="card-text">{{ Producto.descripcion }}</p>
                             <p class="card-text">Precio: ${{ Producto.precio }}</p>
                             <p class="card-text">Categoría: {{ Producto.categoria }}</p>
-                            <p class="card-text">Sabores: {{ Producto.sabores }}</p>
-                            <a href="#" class="btn btn-primary">Editar</a>
+                            <p class="card-text">Sabores o Ingredientes adicionales: </p>
+                            <ul id="sabores">
+                              {% for sabor in Producto.sabores %}
+                                <li>{{ sabor }}</li>
+                              {% endfor %}
+                            </ul>
+                            <a href="{% url 'EditarProducto' pk=Producto.id%}" class="btn btn-primary" style="position: absolute; bottom: 10px; right: 10px;">Editar</a> <!--Boton superpuesto, investigar-->
                         </div>
                     </div>
                 </div>
                 {% endfor %}
         </div>           
     </div>
+    <script>
+      const sabores = {{ Producto.sabores | safe}};
+      
+      const saboresString = JSON.stringify(sabores);
+      
+      document.getElementById("sabores").innerHTML = saboresString;
+      </script>
 
       
     <a href="#" class="btn btn-success" role="button"> Crear Nuevo </a>

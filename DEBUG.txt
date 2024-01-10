@@ -1,0 +1,5 @@
+Usar un env exclusivo
+Direcion y puerto: 127.0.0.2:8000 
+Supersu:
+    Fachadmin
+    MotordeInercia787
