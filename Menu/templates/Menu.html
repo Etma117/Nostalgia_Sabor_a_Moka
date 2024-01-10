@@ -101,7 +101,8 @@
       </script>
 
       
-    <a href="#" class="btn btn-success" role="button"> Crear Nuevo </a>
+    <a href="{% url 'CrearProducto' %}" class="btn btn-success" role="button"> Crear Nuevo </a>
+
  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>   
     {%  if messages %}
       {% for message in messages %}
