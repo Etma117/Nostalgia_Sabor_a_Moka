@@ -1,0 +1,34 @@
+{%extends 'main.html'%}
+{% block contenido %}
+
+<div class="row" style="display: flex; margin: auto;">
+    <div class="col-lg-8 col-lg-7 mx-auto" style="margin: auto;">
+        <div class="dash-unit" style="height: 750px; padding: 20px; margin: auto;">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <h2> ¿Estas seguro(a) de dar de baja {{Producto.nombre}} del menú?</h2>
+                <hr>
+                <div class="thumbnail">
+
+                    {% if Producto.imagen %}
+                        <img src="{{ Producto.imagen.url }}" class="card-img-top" style="width: 100%; height:200px;" alt="...">
+                        {% else %}
+                        <div class="card-placeholder" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">
+                            Sin imagen
+                        </div>
+                        {% endif %}
+                </div>
+                <hr> <!-- Atributos de lo que eliminara-->
+                <p>{{ Producto.descripcion }}</p>
+                <p>Precio: {{ Producto.precio }}</p>
+                <!-- Otros detalles del producto -->
+                
+                <div style=" margin: 20px; ">
+                    <button type="submit" class="btn btn-danger"> Eliminar </button>
+                    <a href="javascript:history.back()" class="btn btn-success">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>   
+</div>       
+{% endblock %}
