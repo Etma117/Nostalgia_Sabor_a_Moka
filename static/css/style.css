@@ -17,7 +17,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Estilos para todos los elementos <p> */
 p {
-  line-height: 1.5; /* Ajusta el interlineado según tus preferencias */
+  line-height: 1.5; 
 }
 
 /* Estilos para card-title */
@@ -25,7 +25,6 @@ p {
   font-family: 'Open Sans'sans-serif;
   color: #8B4513; 
   font-size: 1.5rem; 
-  /* Otros estilos según tus preferencias */
 }
 
 /* Estilos para card-text */

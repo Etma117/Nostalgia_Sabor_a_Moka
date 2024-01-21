@@ -5,19 +5,28 @@ from django.forms import CharField
 from .models import Producto
 
 class ProductoForm(forms.ModelForm):
-    sabores = CharField()
-
     class Meta:
         model = Producto
-        fields = '__all__'
+        fields = '__all__' #nombre, descripcion, sabores, precio, categoria, imagen 
+        labels = {
+            'nombre': 'Nombre del Platillo o Bebida',
+            'descripcion': 'Descripción breve',
+            'sabores': 'Sabores: inserte los sabores separados por una coma.',
+            'precio':'Precio Unitario',
+            'categoria':'Categoria',
+            'imagen':'Imagen Representativa'
+        }
+        widgets ={
+            'nombre': forms.TextInput(attrs={'class':'form-control'}),
+            'descripcion' : forms.TextInput(attrs={'class': 'form-control'}),
+            'sabores': forms.TextInput(attrs={'class':'form-control'}),
+            'categoria': forms.Select(attrs={'class': 'form-input'}),            
+            'precio' : forms.NumberInput(attrs={'class': 'form-control'}),            
+            'imagen' : forms.ClearableFileInput(attrs={'class': 'form-control form-control-lg', 
+                                                       'id':'formFileLg' })
+        }
 
-    def clean_sabores(self):
-        sabores_input = self.cleaned_data.get('sabores')
-        try:
-            # Intenta convertir la entrada a una lista y luego a JSON
-            return json.dumps([sabor.strip() for sabor in sabores_input.split(',')])
-        except json.JSONDecodeError:
-            raise forms.ValidationError("Formato de sabores no válido. Ingrese una lista separada por comas.")
-
+   
+     
 class ProductoAdmin(admin.ModelAdmin):
     form = ProductoForm
