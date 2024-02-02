@@ -1,12 +1,16 @@
 {% extends 'main.html' %}
 
 {% block contenido %} 
-  <h1>Editando Platillo: {{Producto.nombre}}</h1>
-  <div class="col-lg-8 col-lg-7 mx-auto" style="margin: auto;">
+
+<div class="card col-lg-8 col-lg-7 mx-auto" >
+  <div class="card-title" style="margin: 15px;">
+    <h1>Editando Platillo: {{Producto.nombre}}</h1>
+  </div>
+  <div class="card-body" style="margin: 15px;">
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p }}
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between" style="margin-top: 20px;">
         <div class="d-flex">
           <button class="btn btn-primary mr-2" type="submit" style="margin-right: 10px;">Guardar</button>
           <a href="{% url 'Menu' %}" class="btn btn-danger mr-2" type="submit">Cancelar</a>          
@@ -15,7 +19,5 @@
     </div>
     </form>
   </div>
-
-    
-      
+</div>
 {% endblock %}
