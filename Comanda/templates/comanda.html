@@ -1,0 +1,15 @@
+{% extends 'main.html'%}
+
+{% block contenido %}
+<h3> Seleccione el tipo de orden: </h3>
+
+<div class="row">
+    <div class="col-md-6">
+        <a>En sitio </a>
+
+        <a href="{% url 'Domicilio' %}" >A domicilio </a>
+    </div>
+</div>
+
+<a href="{% url 'Dashboard' %}">Cancelar </a>
+{% endblock contenido %}

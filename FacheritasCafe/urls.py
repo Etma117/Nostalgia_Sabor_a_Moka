@@ -24,6 +24,7 @@ urlpatterns = [
     
     path('', include('Dashboard.urls'), name= 'Dashboard'),
     path('Menu/', include('Menu.urls'), name='Menu'),
+    path('Orden/', include('Comanda.urls'), name='Comanda'),
 
 ]
 if settings.DEBUG:
