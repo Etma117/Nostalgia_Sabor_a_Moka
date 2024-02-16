@@ -9,6 +9,10 @@
 The smaller device rules always should write below the bigger device rules
 Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Component
 */
+html
+body{
+  background: white;
+}
 
 /* Estilos para todos los elementos <h> */
 h1, h2, h3, h4, h5, h6 {
