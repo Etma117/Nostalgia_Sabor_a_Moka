@@ -46,9 +46,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'Menu'%}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Menú</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="color: #341e0e; font-size: 25px; margin-right: 150px;">Salir</a> <!-- Salir o Iniciar Sesion-->
+                        {% if user.is_authenticated %}
+                            <a class="nav-link" href="{% url 'logout' %}?next={%url 'Dashboard'%}" style="color: #341e0e; font-size: 25px; margin-right: 150px;">Salir</a>
+                        {% else %}
+                            <a class="nav-link" href="{% url 'login' %}?next={%url 'Dashboard'%}" style="color: #341e0e; font-size: 25px; margin-right: 150px;">Iniciar Sesión</a>
+                        {% endif %}
                     </li>
+
                 </ul>
             </div>
         </div>
