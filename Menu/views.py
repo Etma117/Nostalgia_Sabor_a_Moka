@@ -2,15 +2,16 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Producto, CategoriaMenu
 from .forms import ProductoForm
 
 
-@method_decorator(login_required, name='dispatch')
-class MenuListar(ListView):
+class MenuListar(ListView, LoginRequiredMixin ):
+    login_url = 'login'  
+    redirect_field_name = 'next' 
+
     model = Producto
     template_name = 'Menu.html'
     context_object_name = 'Producto'
