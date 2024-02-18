@@ -1,0 +1,36 @@
+{% extends 'main.html' %}
+
+
+{% block title %}Login{% endblock %}
+
+
+{% block contenido %}
+
+{% if form.errors %}
+    <div class="alert alert-danger" >
+        {{ form.errors }}
+    </div>
+{% endif %}
+
+<h1 class="text-center my-4">Iniciar Sesion</h1>
+<div class="row justify-content-center">
+
+    <div class="col-md-4">
+        <form method="post">
+            {% csrf_token %}
+        
+            <label for="id_username">Nombre de Usuario</label>
+            <input type="text" name="username" class="form-control" placeholder="Nombre de usuario" required>
+        
+            <label for="id_password">Contraseña</label>
+            <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+        
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px">Login</button>
+        </form>
+        
+
+    </div>
+
+</div>
+
+{% endblock %}

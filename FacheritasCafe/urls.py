@@ -26,6 +26,10 @@ urlpatterns = [
     path('Menu/', include('Menu.urls'), name='Menu'),
     path('Orden/', include('Comanda.urls'), name='Comanda'),
 
+    path('accounts/', include('django.contrib.auth.urls')),
+
+
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
