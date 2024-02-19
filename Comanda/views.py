@@ -6,3 +6,6 @@ def home(request):
 
 def domicilio(request):
     return render(request, 'domicilio.html')
+
+def salon(request):
+    return render(request, 'salon.html')
