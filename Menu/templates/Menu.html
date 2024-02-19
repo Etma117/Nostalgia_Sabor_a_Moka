@@ -11,30 +11,12 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Snacks</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Alimentos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Bebidas Calientes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Coctelería</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Crepas</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Waffles</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Postres y más..</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Alimentos</a>
-          </li>
+
+        {% for categoria in categorias %}
+        <li class="nav-item">
+            <a class="nav-link" href="#">{{ categoria.nombreCate }}</a>
+        </li>
+        {% endfor %}
           
         </ul>
         <form class="d-flex">
@@ -50,9 +32,7 @@
         <div class="col-lg-12">
             <div style="display: flex;">
                 <h1>Todos los Productos</h1>
-                <!-- Tu formulario comentado -->
             </div>
-
             {% if messages %}
                 <div class="messages">
                     {% for message in messages %}
