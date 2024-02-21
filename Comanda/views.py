@@ -15,12 +15,9 @@ def home(request):
 def domicilio(request):
     return render(request, 'domicilio.html')
 
-<<<<<<< HEAD
-=======
 def salon(request):
     return render(request, 'salon.html')
 
->>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
 class AgregarAlCarritoView(LoginRequiredMixin, View):
     login_url = 'login'  
     redirect_field_name = 'next' 
