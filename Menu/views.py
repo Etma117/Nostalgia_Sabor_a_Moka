@@ -2,14 +2,25 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Producto
+from .models import Producto, CategoriaMenu
 from .forms import ProductoForm
 
-class MenuListar(ListView):
+
+class MenuListar(ListView, LoginRequiredMixin ):
+    login_url = 'login'  
+    redirect_field_name = 'next' 
+
     model = Producto
     template_name = 'Menu.html'
     context_object_name = 'Producto'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categorias'] = CategoriaMenu.objects.all()
+        return context
+
     
 
 class ProductoCrearView(CreateView):

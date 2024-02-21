@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facheritas Admin</title>
+    <title>{% block title %}Facheritas Admin{% endblock %}</title>
 
     <!-- Libreria Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -45,9 +45,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'Menu'%}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Menú</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="color: #341e0e; font-size: 25px; margin-right: 150px;">Salir</a> <!-- Salir o Iniciar Sesion-->
+                        {% if user.is_authenticated %}
+                            <a class="nav-link" href="{% url 'logout' %}" style="color: #341e0e; font-size: 25px; margin-right: 150px;">Salir</a>
+                        {% else %}
+                            <a class="nav-link" href="{% url 'login' %}" style="color: #341e0e; font-size: 25px; margin-right: 150px;">Iniciar Sesión</a>
+                        {% endif %}
                     </li>
+
                 </ul>
             </div>
         </div>
@@ -123,7 +129,7 @@
             </div>
         </div>
         
-        <div class="row" style="margin-top: 50px;">
+        <div class="row" style="margin-top: 160px;">
             <div class="col-lg-12 d-flex justify-content-center align-items-center">
                 <button href="#" style="width: 200px; height: 100px; background-color: #ffff; border: 5px;border-color: black;">
                     Iniciar Sesion

@@ -20,11 +20,17 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    
+    #apps funcionalidades django
+    path('admin/', admin.site.urls),    
+    path('login/', include('login.urls'), name= 'login'),
+
+    #Apps especificas
     path('', include('Dashboard.urls'), name= 'Dashboard'),
     path('Menu/', include('Menu.urls'), name='Menu'),
     path('Orden/', include('Comanda.urls'), name='Comanda'),
+
+
+
 
 ]
 if settings.DEBUG:
