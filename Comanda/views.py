@@ -1,7 +1,18 @@
+<<<<<<< HEAD
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, TemplateView
 from django.views import View 
 from .models import Carrito, CarritoItem
+=======
+<<<<<<< HEAD
+from django.shortcuts import render, redirect
+=======
+from django.shortcuts import render
+>>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Carrito
+>>>>>>> 0ccc6d3432fb769f9660fe04cfb10d994629baf9
 from Menu.models import Producto
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -21,6 +32,7 @@ class Productos(ListView):
     template_name = 'Productos.html'
     context_object_name = 'Producto'
 
+<<<<<<< HEAD
 @login_required
 def mostrar_carrito(request):
     carrito = Carrito.objects.get_or_create(usuario=request.user)[0]
@@ -28,9 +40,21 @@ def mostrar_carrito(request):
     
     for item in items_carrito:
         item.subtotal = item.producto.precio * item.cantidad
+=======
+    def get(self, request, producto_id):
+        producto = Producto.objects.get(pk=producto_id)
+        carrito, created = Carrito.objects.get_or_create(usuario=request.user, producto=producto)
+        carrito.cantidad += 1
+        carrito.save()
+<<<<<<< HEAD
+        return redirect('carrito')
+=======
+        return redirect('carrito')
+>>>>>>> 0ccc6d3432fb769f9660fe04cfb10d994629baf9
 
     total = sum(item.subtotal for item in items_carrito)
 
+<<<<<<< HEAD
     return render(request, 'carrito.html', {'items_carrito': items_carrito, 'total' : total })
 
 @login_required
@@ -68,3 +92,9 @@ def eliminar_producto_del_carrito(request, carrito_item_id):
         carrito_item.delete()
 
     return redirect('mostrar_carrito')
+=======
+    def get(self, request):
+        carrito_items = Carrito.objects.filter(usuario=request.user)
+        return render(request, 'carrito.html', {'carrito_items': carrito_items})
+>>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
+>>>>>>> 0ccc6d3432fb769f9660fe04cfb10d994629baf9
