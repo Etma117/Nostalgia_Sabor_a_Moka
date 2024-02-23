@@ -74,6 +74,20 @@
                                 <li>{{ sabor }}</li>
                               {% endfor %}
                             </ul>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                            {% comment %} {%if user.is_staff %} {% endcomment %}
+<<<<<<< HEAD
+=======
+                              <!-- Botón para abrir el modal del producto actual -->
+>>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal{{ Producto.id }}">
+                              Añadir {{ Producto.nombre }}
+                            </button>
+>>>>>>> 0ccc6d3432fb769f9660fe04cfb10d994629baf9
+>>>>>>> e4e796027b5578c93ccdb4fcc368d9ec7b9c18d9
                             {% comment %} {% else %} {% endcomment %}
                             <a href="{% url 'EditarProducto' pk=Producto.id%}" class="btn btn-primary" style="position: absolute; bottom: 10px; right: 20px;">Editar</a> <!--Boton superpuesto, investigar-->
                             {% comment %} {% endif %} {% endcomment %}
@@ -85,6 +99,107 @@
         </div>           
     </div>
     
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+    
+    {% for Producto in Producto %}
+    <div class="modal fade" id="productoModal{{ Producto.id }}" tabindex="-1" aria-labelledby="productoModalLabel{{ Producto.id }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+<<<<<<< HEAD
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Formulario Modal</h5>
+          </div>
+          <div class="modal-body">
+            <!-- Contenido del formulario -->
+            <form role="form" id="agregarAlCarritoForm{{ Producto.id }}" action="{% url 'agregar_al_carrito' producto_id=Producto.id  %}" method="post" class="form-inline">
+              {% csrf_token %}
+              <div class="modal-header">
+                <h5 class="modal-title" id="productoModalLabel{{ Producto.id }}">{{ Producto.nombre }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <!-- Aquí puedes acceder a los datos del producto y mostrarlos -->
+                {% if Producto.imagen %}
+                    <img src="{{ Producto.imagen.url }}" class="img-fluid" alt="{{ Producto.descripcion }}">
+                {% else %}
+                    <div class="img-fluid" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">
+                        Sin imagen
+                    </div>
+                {% endif %}
+                <p>{{ Producto.descripcion }}</p>
+                <p>Precio: ${{ Producto.precio }} MXN</p>
+
+                <!-- Checkbox para sabores -->
+                <div class="form-check">
+                    {% for sabor in Producto.sabores %}
+                        <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores" id="sabor_{{ forloop.counter }}">
+                        <label class="form-check-label" for="sabor_{{ forloop.counter }}">{{ sabor }}</label><br>
+                    {% endfor %}
+                </div>
+
+                  <div class="form-group">
+                      <label for="comentarios">Comentarios:</label>
+                      <textarea class="form-control" name="comentarios" id="comentarios" rows="3" placeholder="(opcional)"></textarea>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {%endfor%}
+=======
+              <form id="agregarAlCarritoForm{{ Producto.id }}" method="post">
+                  {% csrf_token %}
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="productoModalLabel{{ Producto.id }}">{{ Producto.nombre }}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <!-- Aquí puedes acceder a los datos del producto y mostrarlos -->
+                      {% if Producto.imagen %}
+                          <img src="{{ Producto.imagen.url }}" class="img-fluid" alt="{{ Producto.descripcion }}">
+                      {% else %}
+                          <div class="img-fluid" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">
+                              Sin imagen
+                          </div>
+                      {% endif %}
+                      <p>{{ Producto.descripcion }}</p>
+                      <p>Precio: ${{ Producto.precio }} MXN</p>
+  
+                      <!-- Checkbox para sabores -->
+                      <div class="form-check">
+                          {% for sabor in Producto.sabores %}
+                              <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores" id="sabor_{{ forloop.counter }}">
+                              <label class="form-check-label" for="sabor_{{ forloop.counter }}">{{ sabor }}</label><br>
+                          {% endfor %}
+                      </div>
+  
+                      <div class="form-group">
+                          <label for="comentarios">Comentarios:</label>
+                          <textarea class="form-control" name="comentarios" id="comentarios" rows="3" placeholder="(opcional)"></textarea>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                      <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+    {% endfor %}
+>>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
+
+>>>>>>> 0ccc6d3432fb769f9660fe04cfb10d994629baf9
+>>>>>>> e4e796027b5578c93ccdb4fcc368d9ec7b9c18d9
     <a href="{% url 'CrearProducto' %}" class="btn btn-success" role="button"> Crear Nuevo </a>
 
  

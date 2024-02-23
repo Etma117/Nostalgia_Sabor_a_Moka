@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
 {% load static %}
 
+<<<<<<< HEAD
 
 {% block contenido %}
 
@@ -38,5 +39,56 @@
     {% else %}
         <p>El carrito está vacío.</p>
     {% endif %}
+=======
+{% block contenido %}
+
+<h2>Orden</h2>
+{% if items_carrito %}
+<table>
+  <thead>
+    <tr style="text-align: center;">
+      <th>Producto</th>
+      <th>Sabor</th>
+      <th>Cantidad</th>
+      <th>Precio Unitario</th>
+      <th>Subtotal</th>
+      <th>Eliminar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items_carrito %}
+      <tr style="text-align: center;">
+        <td>{{ item.producto.nombre }}</td>
+        <td>{{ item.sabor }}</td>
+        <td>{{ item.cantidad }}</td>
+        <td>${{ item.producto.precio }} MXN</td>
+        <td>${{ item.subtotal }}</td>
+        <td>
+          <form action="{% url 'eliminar_producto_del_carrito' carrito_item_id=item.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link" title="Eliminar">
+              <i class="bi bi-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4">Total</td>
+      <td>${{ total }}</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
+<button>
+  Pagar
+</button>
+{% else %}
+<p>No hay productos en el carrito.</p>
+{% endif %}
+>>>>>>> e4e796027b5578c93ccdb4fcc368d9ec7b9c18d9
 
 {% endblock contenido %}
