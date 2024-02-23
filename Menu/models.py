@@ -15,8 +15,6 @@ class Producto(models.Model):
     categoria = models.ForeignKey(CategoriaMenu, on_delete=models.CASCADE)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
 
-    
-
     def obtener_sabores(self):
         return [sabor.strip() for sabor in self.sabores_raw.split(',')]
 
