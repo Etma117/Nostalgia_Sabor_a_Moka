@@ -1,31 +1,42 @@
 {% extends 'main.html' %}
 {% load static %}
 
-{% block conntenido %}
+
+{% block contenido %}
+
 <h1>Carrito de Compras</h1>
-    
-    {% if carrito_items %}
+
+    {% if items %}
         <table>
             <thead>
                 <tr>
                     <th>Producto</th>
-                    <th>Precio</th>
+                    <th>Sabores Elegidos</th>
                     <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in carrito_items %}
+                {% for item in items %}
                     <tr>
                         <td>{{ item.producto.nombre }}</td>
-                        <td>${{ item.producto.precio }}</td>
+                        <td>
+                            {% for sabor in item.sabores_elegidos %}
+                                {{ sabor }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
                         <td>{{ item.cantidad }}</td>
+                        <td>${{ item.producto.precio }}</td>
+                        <td>${{ item.subtotal }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <p>Total: $</p>
     {% else %}
         <p>El carrito está vacío.</p>
     {% endif %}
-    
-    <a href="{% url 'inicio' %}">Seguir comprando</a>
-{% endblock conntenido %}
+
+{% endblock contenido %}

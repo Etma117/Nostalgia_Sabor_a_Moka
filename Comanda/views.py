@@ -1,12 +1,10 @@
-<<<<<<< HEAD
-from django.shortcuts import render, redirect
-=======
-from django.shortcuts import render
->>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Carrito
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, TemplateView
+from django.views import View 
+from .models import Carrito, CarritoItem
 from Menu.models import Producto
+from .forms import SeleccionSaboresForm
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def home(request):
@@ -18,25 +16,33 @@ def domicilio(request):
 def salon(request):
     return render(request, 'salon.html')
 
-class AgregarAlCarritoView(LoginRequiredMixin, View):
-    login_url = 'login'  
-    redirect_field_name = 'next' 
+class Productos(ListView):
+    model = Producto
+    template_name = 'Productos.html'
+    context_object_name = 'Producto'
 
-    def get(self, request, producto_id):
-        producto = Producto.objects.get(pk=producto_id)
-        carrito, created = Carrito.objects.get_or_create(usuario=request.user, producto=producto)
-        carrito.cantidad += 1
-        carrito.save()
-<<<<<<< HEAD
-        return redirect('carrito')
-=======
-        return redirect('carrito')
+@login_required
+def Carrito(request):
+    carrito_id = request.session.get('carrito_id')
+    carrito, created = Carrito.objects.get_or_create(id=carrito_id)
 
-class VerCarritoView(LoginRequiredMixin, View):
-    login_url = 'login'  
-    redirect_field_name = 'next' 
+    carrito_items = carrito.carritoitem_set.all()
+    total = sum(item.producto.precio * item.cantidad for item in carrito_items)
 
-    def get(self, request):
-        carrito_items = Carrito.objects.filter(usuario=request.user)
-        return render(request, 'carrito.html', {'carrito_items': carrito_items})
->>>>>>> 8cfbabb16bc1dc01662fb6a3e2298a4aec853728
+    return render(request, 'carrito.html', {'carrito_items': carrito_items, 'total': total})
+
+@login_required
+def AgregarAlCarrito(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user.id')
+        product_id = request.POST.get('producto.id')
+        quantity = int(request.POST.get('cantidad', 1))
+
+        user = request.user
+        producto = get_object_or_404(Producto, id=product_id)
+
+        carrito_id = request.session.get('carrito_id')
+        carrito, created = Carrito.objects.get_or_create(id=carrito_id)
+
+    return redirect('view_cart')
+    
