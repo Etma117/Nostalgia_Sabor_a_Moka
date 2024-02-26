@@ -5,11 +5,56 @@
 
 <div class="row">
     <div class="col-md-6">
-        <a href="{% url 'Salon' %}">En sitio </a>
+        <label>
+            <input type="radio" name="tipoEntrega" value="en-sitio" onclick="mostrarMesas()"> En sitio
+        </label>
 
-        <a href="{% url 'Domicilio' %}" >A domicilio </a>
+        <label>
+            <input type="radio" name="tipoEntrega" value="a-domicilio" onclick="mostrarFormulario()"> A domicilio
+        </label>
+    </div>
+</div>
+
+<form id="formularioDomicilio" style="display: none;">
+    <h3> Añada los datos del domicilio del Cliente: </h3>
+
+    <label for="Nombre">Nombre: </label>
+    <input type="text"/>
+
+    <label for="Nombre">Dirección: </label>
+    <input type="text"/>
+
+    <label for="Nombre">Número de Teléfono: </label>
+    <input type="number" name="Numero" id="Telephone"/>
+</form>
+
+
+<div id="mesasDisponibles" style="display: none;">
+    <select class="form-select form-select-sm" name="Mesas" id="Mesas">
+        <option value="Mesa1"> Mesa 1</option>
+        <option value="Mesa2"> Mesa 2</option>
+    </select>
+</div>
+
+<div class="row">
+    <div>
+        <a href="{% url 'Productos' %}"> Crear Orden </a>
     </div>
 </div>
 
 <a href="{% url 'Dashboard' %}">Cancelar </a>
+
+<!--Mmuestra y oculta segun la seleccion-->
+<script>
+    function mostrarFormulario() {
+        document.getElementById("formularioDomicilio").style.display = "block";
+        document.getElementById("mesasDisponibles").style.display = "none";
+    }
+
+    function mostrarMesas() {
+        document.getElementById("formularioDomicilio").style.display = "none";
+        document.getElementById("mesasDisponibles").style.display = "block";
+    }
+</script>
+
 {% endblock contenido %}
