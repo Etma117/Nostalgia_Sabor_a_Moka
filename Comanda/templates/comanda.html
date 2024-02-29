@@ -15,18 +15,18 @@
     </div>
 </div>
 
-<form id="formularioDomicilio" style="display: none;" method="post" action="#">
+<form id="formularioDomicilio" style="display: none;" method="post" action="{% url 'carrito_pedido_domicilio' %}">
     {% csrf_token %}
     <h3> Añada los datos del domicilio del Cliente: </h3>
 
     <label for="Nombre">Nombre: </label>
-    <input type="text"/>
+    <input type="text" name="nombre"/>
 
     <label for="Nombre">Dirección: </label>
-    <input type="text"/>
+    <input type="text" name="direccion"/>
 
     <label for="Nombre">Número de Teléfono: </label>
-    <input type="number" name="Numero" id="Telephone"/>
+    <input type="tel" name="numero" id="Telephone"/>
     <div class="row">
         {% for Producto in productos %}
             <div class="col-sm-3">
@@ -98,12 +98,6 @@
     </div>
 </form>
 {% endfor %}
-
-<div class="row">
-    <div>
-        <a href="{% url 'Productos' %}"> Crear Orden </a>
-    </div>
-</div>
 
 <a href="{% url 'Dashboard' %}">Cancelar </a>
 

@@ -84,6 +84,9 @@ class Carrito_domicilio (View):
 
     def post(self, request):
         producto_id = request.POST.get ('id_producto')
+        nombre = request.POST.get('nombre')
+        direccion = request.POST.get('direccion')
+        numero = request.POST.get('numero')
         cantidad = int(request.POST.get('cantidad', 1))
 
         producto = get_object_or_404(Producto, id=producto_id)
@@ -91,6 +94,7 @@ class Carrito_domicilio (View):
         sabores_seleccionados = request.POST.getlist('sabores')
 
         carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
+        pedido_domicilio, created = PedidoDomicilio.objects.get_or_create(nombre=nombre, direccion=direccion, telefono=numero)
         for sabor in sabores_seleccionados:
             carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
 
@@ -105,13 +109,16 @@ class Carrito_domicilio (View):
 class EliminarProductoDelCarrito(View):
     def post(self, request, carrito_item_id):
         carrito_item = get_object_or_404(CarritoItem, id=carrito_item_id)
+        carrito = carrito_item.carrito
         carrito_item.delete()
 
-        if hasattr(carrito_item, 'carrito') and carrito_item.carrito:
+        if carrito and carrito.mesa:
             return redirect('carrito_por_mesa', mesa_id=carrito_item.carrito.mesa.id)
         
         # Ejemplo: Redirigir al carrito de domicilio
-        if hasattr(carrito_item, 'pedido_domicilio') and carrito_item.pedido_domicilio:
+        if carrito and carrito.pedido_domicilio:
+            carrito.pedido_domicilio.delete()
+            # carrito.delete()
             return redirect('carrito_pedido_domicilio')
         
         return redirect('MostrarCarrito')

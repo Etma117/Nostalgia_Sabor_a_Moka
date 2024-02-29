@@ -17,72 +17,72 @@
   </button>
 </form>
 
-{% block carrito_content %}
-  {% if carrito %}
+
+{% if carrito %}
   {% if carrito.mesa %}
-  <h2>Orden - Mesa {{ carrito.mesa.numero }} </h2>
+    <h2>Orden - Mesa {{ carrito.mesa.numero }} </h2>
   {% else %}
-  <h2> Orden - Pedido a Domicilio {{ carrito.pedido_domicilio.id }}</h2>
+    <h2> Orden - Pedido a Domicilio {{ carrito.pedido_domicilio.id }}</h2>
+    <h2> Para {{ carrito.pedido_domicilio.nombre}} </h2>
   {% endif %}
     
-    <table class="table">
-      <thead>
+  <table class="table">
+    <thead>
+      <tr style="text-align: center;">
+        <th>Producto</th>
+        <th>Sabor</th>
+        <th>Cantidad</th>
+        <th>Precio Unitario</th>
+        <th>Subtotal</th>
+        <th>Eliminar</th>
+        <th>Agregar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items_carrito %}
         <tr style="text-align: center;">
-          <th>Producto</th>
-          <th>Sabor</th>
-          <th>Cantidad</th>
-          <th>Precio Unitario</th>
-          <th>Subtotal</th>
-          <th>Eliminar</th>
-          <th>Agregar</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in items_carrito %}
-          <tr style="text-align: center;">
-            <td>{{ item.producto.nombre }}</td>
-            <td>{{ item.sabor }}</td>
-            <td>{{ item.cantidad }}</td>
-            <td>${{ item.producto.precio }} MXN</td>
-            <td>${{ item.subtotal }}</td>
-            <td>
-              <form action="{% url 'eliminar_producto_carrito' carrito_item_id=item.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-link" title="Eliminar">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </form>
-            </td>
-            <td>
-              <form action="{% url 'agregar_cantidad_producto' carrito_item_id=item.id %}" method="post">
-                  {% csrf_token %}
-                  <input type="number" name="nueva_cantidad" value="1" min="1" style="width: 50px;" required>
-                  <button type="submit" class="btn btn-link" title="Agregar más cantidad">
-                      <i class="bi bi-plus"></i>
-                  </button>
-              </form>
+          <td>{{ item.producto.nombre }}</td>
+          <td>{{ item.sabor }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>${{ item.producto.precio }} MXN</td>
+          <td>${{ item.subtotal }}</td>
+          <td>
+            <form action="{% url 'eliminar_producto_carrito' carrito_item_id=item.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
           </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr style="text-align: center;">
-          <td></td>
-          <td></td>
-          <td></td>
-          <td><strong>Total</strong></td>
-          <td>${{ total }}</td>
-          <td></td>
-          <td></td>
+          <td>
+            <form action="{% url 'agregar_cantidad_producto' carrito_item_id=item.id %}" method="post">
+              {% csrf_token %}
+                <input type="number" name="nueva_cantidad" value="1" min="1" style="width: 50px;" required>
+                <button type="submit" class="btn btn-link" title="Agregar más cantidad">
+                  <i class="bi bi-plus"></i>
+                </button>
+            </form>
+          </td>
         </tr>
-      </tfoot>
-    </table>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr style="text-align: center;">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><strong>Total</strong></td>
+        <td>${{ total }}</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
     
-    <button>Pagar</button>
+  <button>Pagar</button>
   
-  {% else %}
-    <p>No hay productos en el carrito.</p>
-  {% endif %}
-{% endblock %}
+{% else %}
+  <p>No hay productos en el carrito.</p>
+{% endif %}
 
 {% endblock contenido %}
