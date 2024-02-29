@@ -1,0 +1,12 @@
+<h1>Detalles de Pago</h1>
+
+<p>Fecha de venta: {{ venta.fecha_venta }} - Hora de venta: {{ venta.hora_venta }}</p>
+
+<h2>Productos comprados:</h2>
+<ul>
+    {% for item in venta.carrito.carritoitem_set.all %}
+        <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }} - Subtotal: {{ item.subtotal }}</li>
+    {% endfor %}
+</ul>
+
+<p>Total a pagar: ${{ total }}</p>

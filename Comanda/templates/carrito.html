@@ -4,14 +4,14 @@
 {% block contenido %}
 
 {% for mesa in mesas %}
-  <form action="{% url 'mostrar_carrito_mesa' mesa_id=mesa.id %}" method="get">
+  <form action="{% url 'carrito_por_mesa' mesa_id=mesa.id %}" method="get">
     <button type="submit" class="btn btn-link" title="Carrito de Mesa {{ mesa.numero }}">
       Mesa {{ mesa.numero }}
     </button>
   </form>
 {% endfor %}
 
-<form action="{% url 'mostrar_carrito_pedido_domicilio' pedido_domicilio_id=pedido_domicilio.id %}" method="get">
+<form action="{% url 'carrito_pedido_domicilio' %}" method="get">
   <button type="submit" class="btn btn-link" title="Carrito de Pedido a Domicilio">
     Pedido a Domicilio
   </button>
@@ -19,8 +19,13 @@
 
 {% block carrito_content %}
   {% if carrito %}
-    <h2>Orden - {{ carrito.mesa.numero }} / Pedido a Domicilio {{ carrito.pedido_domicilio.id }}</h2>
-    <table>
+  {% if carrito.mesa %}
+  <h2>Orden - Mesa {{ carrito.mesa.numero }} </h2>
+  {% else %}
+  <h2> Orden - Pedido a Domicilio {{ carrito.pedido_domicilio.id }}</h2>
+  {% endif %}
+    
+    <table class="table">
       <thead>
         <tr style="text-align: center;">
           <th>Producto</th>
@@ -29,6 +34,7 @@
           <th>Precio Unitario</th>
           <th>Subtotal</th>
           <th>Eliminar</th>
+          <th>Agregar</th>
         </tr>
       </thead>
       <tbody>
@@ -40,79 +46,43 @@
             <td>${{ item.producto.precio }} MXN</td>
             <td>${{ item.subtotal }}</td>
             <td>
-              <form action="{% url 'eliminar_producto_del_carrito' carrito_item_id=item.id %}" method="post">
+              <form action="{% url 'eliminar_producto_carrito' carrito_item_id=item.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-link" title="Eliminar">
                   <i class="bi bi-trash"></i>
                 </button>
               </form>
             </td>
+            <td>
+              <form action="{% url 'agregar_cantidad_producto' carrito_item_id=item.id %}" method="post">
+                  {% csrf_token %}
+                  <input type="number" name="nueva_cantidad" value="1" min="1" style="width: 50px;" required>
+                  <button type="submit" class="btn btn-link" title="Agregar más cantidad">
+                      <i class="bi bi-plus"></i>
+                  </button>
+              </form>
+          </td>
           </tr>
         {% endfor %}
       </tbody>
       <tfoot>
-        <tr>
-          <td colspan="4">Total</td>
+        <tr style="text-align: center;">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><strong>Total</strong></td>
           <td>${{ total }}</td>
+          <td></td>
           <td></td>
         </tr>
       </tfoot>
     </table>
     
-    <button>
-      Pagar
-    </button>
+    <button>Pagar</button>
+  
   {% else %}
     <p>No hay productos en el carrito.</p>
   {% endif %}
 {% endblock %}
-
-{% comment %} <h2>Orden</h2>
-{% if items_carrito %}
-<table>
-  <thead>
-    <tr style="text-align: center;">
-      <th>Producto</th>
-      <th>Sabor</th>
-      <th>Cantidad</th>
-      <th>Precio Unitario</th>
-      <th>Subtotal</th>
-      <th>Eliminar</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in items_carrito %}
-      <tr style="text-align: center;">
-        <td>{{ item.producto.nombre }}</td>
-        <td>{{ item.sabor }}</td>
-        <td>{{ item.cantidad }}</td>
-        <td>${{ item.producto.precio }} MXN</td>
-        <td>${{ item.subtotal }}</td>
-        <td>
-          <form action="{% url 'eliminar_producto_del_carrito' carrito_item_id=item.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-link" title="Eliminar">
-              <i class="bi bi-trash"></i>
-            </button>
-          </form>
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="4">Total</td>
-      <td>${{ total }}</td>
-      <td></td>
-    </tr>
-  </tfoot>
-</table>
-
-<button>
-  Pagar
-</button>
-{% else %}
-<p>No hay productos en el carrito.</p>
-{% endif %} {% endcomment %}
 
 {% endblock contenido %}

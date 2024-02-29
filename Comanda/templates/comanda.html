@@ -15,7 +15,8 @@
     </div>
 </div>
 
-<form id="formularioDomicilio" style="display: none;">
+<form id="formularioDomicilio" style="display: none;" method="post" action="#">
+    {% csrf_token %}
     <h3> Añada los datos del domicilio del Cliente: </h3>
 
     <label for="Nombre">Nombre: </label>
@@ -26,15 +27,77 @@
 
     <label for="Nombre">Número de Teléfono: </label>
     <input type="number" name="Numero" id="Telephone"/>
+    <div class="row">
+        {% for Producto in productos %}
+            <div class="col-sm-3">
+                <div class="card" style="width: 22rem; position: relative;">
+                    {% if Producto.imagen %}
+                        <img src="{{ Producto.imagen.url }}" class="card-img-top" style="width: 100%; height:200px;" alt="..." >
+                    {% else %}
+                        <div class="card-placeholder" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">
+                            Sin imagen
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ Producto.nombre }}</h5>
+                        <p class="card-text">Precio: ${{ Producto.precio }} MXN</p>
+                            {% for sabor in Producto.sabores %}
+                                <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores">
+                                <label class="form-check-label">{{ sabor }}</label><br>
+                            {% endfor %}
+    
+                            <input type="number" name="cantidad" style="width: 50px; height: 25px;" value="1" min="1">
+                            <input type="hidden" name="id_producto" value ="{{ Producto.id }}">
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar al Carrito <i class="bi bi-plus-circle-fill"></i></button>
 </form>
 
+{% for mesa in mesas %}
+<form method="post" action="{% url 'carrito_por_mesa' mesa_id=mesa.id %}">
+    {% csrf_token %}
+    
+    <div id="mesasDisponibles" style="display: none;">
+      <select class="form-select form-select-sm" name="mesa_id" id="Mesa">
+          {% for mesa in mesas %}
+              <option value="{{ mesa.id }}">Mesa {{ mesa.numero }}</option>
+          {% endfor %}
+      </select>
 
-<div id="mesasDisponibles" style="display: none;">
-    <select class="form-select form-select-sm" name="Mesas" id="Mesas">
-        <option value="Mesa1"> Mesa 1</option>
-        <option value="Mesa2"> Mesa 2</option>
-    </select>
-</div>
+      <div class="row">
+        {% for Producto in productos %}
+            <div class="col-sm-3">
+                <div class="card" style="width: 22rem; position: relative;">
+                    {% if Producto.imagen %}
+                        <img src="{{ Producto.imagen.url }}" class="card-img-top" style="width: 100%; height:200px;" alt="..." >
+                    {% else %}
+                        <div class="card-placeholder" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">
+                            Sin imagen
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ Producto.nombre }}</h5>
+                        <p class="card-text">Precio: ${{ Producto.precio }} MXN</p>
+                            {% for sabor in Producto.sabores %}
+                                <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores">
+                                <label class="form-check-label">{{ sabor }}</label><br>
+                            {% endfor %}
+    
+                            <input type="number" name="cantidad" style="width: 50px; height: 25px;" value="1" min="1">
+                            <input type="hidden" name="id_producto" value ="{{ Producto.id }}">
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agregar al Carrito <i class="bi bi-plus-circle-fill"></i></button>
+    </div>
+</form>
+{% endfor %}
 
 <div class="row">
     <div>

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'Menu',
     'Dashboard',
     'Comanda',
+    'Venta',
 
 ]
 
