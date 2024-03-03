@@ -14,7 +14,7 @@ class BuscadorProductosMixin:
         self.productos = Producto.objects.all()
 
         if busqueda:
-            atributos_a_buscar = ['nombre','descripcion', 'precio','categoria',]
+            atributos_a_buscar = ['nombre','descripcion', 'precio', 'categoria__nombreCate']
             query = Q()
 
             for atributo in atributos_a_buscar:
@@ -22,14 +22,20 @@ class BuscadorProductosMixin:
 
             self.productos = self.productos.filter(query)
 
+    def get_context_data(self, **kwargs):
+        self.buscar()
+        context = super().get_context_data(**kwargs)
+        context['Productos'] = self.productos
+        return context
 
-class MenuListar(ListView, LoginRequiredMixin, BuscadorProductosMixin ):
+
+class MenuListar( BuscadorProductosMixin, ListView, LoginRequiredMixin ):
     login_url = 'login'  
     redirect_field_name = 'next' 
 
     model = Producto
     template_name = 'Menu.html'
-    context_object_name = 'Producto'       
+    context_object_name = 'Productos'       
     
     def get_queryset(self):
         categoria_id = self.kwargs.get('categoria_id')
