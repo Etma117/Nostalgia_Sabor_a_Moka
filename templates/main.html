@@ -67,35 +67,9 @@
     <!--Inicio de Body (Contenido)
     ************************************
     -->
-        {%block contenido%}
-        <!--
-        <div class="row flex-md-row">
-            <div class="col-md-12 d-flex justify-content-center align-items-center">
-                <img src="{% static 'images/CafeMain1.png' %}" style="width: 1320px;" class="img-fluid" alt="...">
-            </div>          
-        </div>
-        <div class="row">
-            <div class="col-lg-12 d-flex justify-content-center align-items-center">
-                <button href="#" style="width: 200px; height: 100px; background-color: #ffff; border: 5px;border-color: black;">
-                    Iniciar Sesion
-                </button>
-            </div>
-        </div>
+    <div class="container flex">
 
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 d-flex justify-content-center align-items-center">
-                    <img src="{% static 'images/CafeMain2.png' %}" style="width: 440px; height: 295px;" class="img-fluid" alt="...">
-                </div>
-                <div class="col-md-4 d-flex justify-content-center align-items-center">
-                    <img src="{% static 'images/CafeMain3.png' %}" style="width: 440px; height: 295px;" class="img-fluid" alt="...">
-                </div>
-                <div class="col-md-4 d-flex justify-content-center align-items-center">
-                    <img src="{% static 'images/CafeMain4.png' %}" style="width: 440px; height: 295px;" class="img-fluid" alt="...">
-                </div>
-            </div>
-        </div>
-        -->
+        {%block contenido%}  
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
               <div class="swiper-slide">
@@ -133,13 +107,15 @@
         
         <div class="row" style="margin-top: 160px;">
             <div class="col-lg-12 d-flex justify-content-center align-items-center">
-                <button href="#" style="width: 200px; height: 100px; background-color: #ffff; border: 5px;border-color: black;">
-                    Iniciar Sesion
-                </button>
+                {% if user.is_authenticated %}
+                            <a class="btn btn-success" href="{% url 'logout' %}?next={% url 'Dashboard' %}" style="background-color: #9f663e; border-color:  #9f663e;">Cerrar Sesión</a>
+                        {% else %}
+                            <a class="btn btn-success" href="{% url 'login' %}?next={% url 'Dashboard' %}" style="background-color: #9f663e; border-color:  #9f663e;" >Iniciar Sesión</a>
+                        {% endif %}
             </div>
         </div>
 
-        <div class="container">
+        <div class="container" style ="margin-top: 15px;">
             <div class="row">
                 <div class="col-md-4 d-flex justify-content-center align-items-center">
                     <img src="{% static 'images/CafeMain2.png' %}" style="width: 440px; height: 295px;" class="img-fluid" alt="...">
@@ -152,8 +128,9 @@
                 </div>
             </div>
         </div>
-
         {%endblock contenido %}
+
+    </div>
     <script>
         const container =
         document.querySelector('.col-md-12');

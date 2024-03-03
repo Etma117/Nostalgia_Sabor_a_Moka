@@ -3,7 +3,7 @@
 
 {% block contenido %} 
   
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light " style="background-color: #ffffff; color: #ffffff;">
     <div class="container-fluid">
       <a class="navbar-brand" style="color: #8B4513; font-size: 25px;">Menú</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -14,7 +14,7 @@
 
         {% for categoria in categorias %}
         <li class="nav-item">
-            <a class="nav-link" href="#">{{ categoria.nombreCate }}</a>
+          <a class="nav-link" href="{% url 'menu_por_categoria' categoria.id %}">{{ categoria.nombreCate }}</a>        
         </li>
         {% endfor %}
           
@@ -82,7 +82,7 @@
             {% endfor %}
         </div>           
     </div>
-    <a href="{% url 'CrearProducto' %}" class="btn btn-success" role="button"> Crear Nuevo </a>
+    <a href="{% url 'CrearProducto' %}" class="btn btn-success" style="margin-top: 15px;"> Crear Nuevo </a>
 
  
  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>   
