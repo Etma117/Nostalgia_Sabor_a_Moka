@@ -8,50 +8,43 @@ from django.db.models import Q
 from .models import Producto, CategoriaMenu
 from .forms import ProductoForm
 
-class BuscadorProductosMixin:
-    def buscar(self):
-        busqueda = self.request.GET.get("Buscar")
-        self.productos = Producto.objects.all()
+class BuscadorYCategoriasMixin():
+     
 
+    def get_queryset(self):
+        categoria_id = self.kwargs.get('categoria_id')
+        productos = Producto.objects.all()
+
+        if categoria_id:
+            productos = productos.filter(categoria=categoria_id)
+
+        busqueda = self.request.GET.get("Buscar")
         if busqueda:
-            atributos_a_buscar = ['nombre','descripcion', 'precio', 'categoria__nombreCate']
+            atributos_a_buscar = ['nombre', 'descripcion', 'precio', 'categoria__nombreCate']
             query = Q()
 
             for atributo in atributos_a_buscar:
                 query |= Q(**{f'{atributo}__icontains': busqueda})
 
-            self.productos = self.productos.filter(query)
+            productos = productos.filter(query)
 
-    def get_context_data(self, **kwargs):
-        self.buscar()
-        context = super().get_context_data(**kwargs)
-        context['Productos'] = self.productos
-        return context
-
-
-class MenuListar( BuscadorProductosMixin, ListView, LoginRequiredMixin ):
-    login_url = 'login'  
-    redirect_field_name = 'next' 
-
-    model = Producto
-    template_name = 'Menu.html'
-    context_object_name = 'Productos'       
-    
-    def get_queryset(self):
-        categoria_id = self.kwargs.get('categoria_id')
-        if categoria_id:
-            return Producto.objects.filter(categoria=categoria_id)
-        else:
-            return Producto.objects.all()
+        return productos
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categorias'] = CategoriaMenu.objects.all()
         return context
 
+class MenuListar(LoginRequiredMixin, BuscadorYCategoriasMixin, ListView):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+
+    model = Producto
+    template_name = 'Menu.html'
+    context_object_name = 'Productos'
     
 
-class ProductoCrearView(CreateView, LoginRequiredMixin):
+class ProductoCrearView(LoginRequiredMixin, CreateView ):
     model = Producto
     template_name = 'crear_producto.html'
     context_object_name = 'Producto'
@@ -62,7 +55,7 @@ class ProductoCrearView(CreateView, LoginRequiredMixin):
         messages.success(self.request, 'El platillo se ha creado exitosamente.')
         return super().form_valid(form)
     
-class ProductoEditarView(UpdateView, LoginRequiredMixin):
+class ProductoEditarView( LoginRequiredMixin, UpdateView):
     model = Producto
     template_name = 'editar_producto.html'
     context_object_name = 'Producto'
@@ -74,7 +67,7 @@ class ProductoEditarView(UpdateView, LoginRequiredMixin):
         return super().form_valid(form)
     
 
-class ProductoEliminarView(DeleteView, LoginRequiredMixin):
+class ProductoEliminarView(LoginRequiredMixin, DeleteView):
     model = Producto
     template_name = 'eliminar_producto.html'
     context_object_name = 'Producto'
@@ -85,7 +78,7 @@ class ProductoEliminarView(DeleteView, LoginRequiredMixin):
         return super().form_valid(form)
 
 
-class ProductoDetalle(DetailView, LoginRequiredMixin):
+class ProductoDetalle(LoginRequiredMixin, DetailView ):
     model = Producto
     template_name = 'producto_detalle.html'
     context_object_name = 'Producto'  # Nombre de la variable en la plantilla
