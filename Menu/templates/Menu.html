@@ -1,6 +1,36 @@
 {% extends 'main.html' %}
 {% load static %}
 
+{%block extra_css%}
+<style>
+  .card {
+      width: 25rem;
+      height: 35rem;
+      margin: 15px;
+  }
+
+  @media (max-width: 1400px) {
+      .card {
+          width: calc(95%);
+      }
+  }
+
+  @media (max-width: 1200px) {
+      .card {
+          width: calc(80%); 
+      }
+  }
+
+  @media (max-width: 992px) {
+      .card {
+          width: calc(80%);
+      }
+  }
+
+  
+</style>
+{% endblock %}
+
 {% block contenido %} 
   
 <nav class="navbar navbar-expand-lg navbar-light " style="background-color: #ffffff; color: #ffffff;">
@@ -54,8 +84,8 @@
     <div class="container-fluid">
         <div class="row">
             {% for Producto in Productos %}
-                <div class="col-sm-3">
-                    <div class="card" style="width: 22rem; position: relative;">
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="card card-item" >
 
                         {% if Producto.imagen %}
                         <img src="{{ Producto.imagen.url }}" class="card-img-top" style="width: 100%; height:200px;" alt="...">
