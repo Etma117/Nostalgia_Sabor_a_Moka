@@ -3,6 +3,8 @@ from django.views.generic import ListView, View
 from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
 from Menu.models import Producto
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 # Create your views here.
 def home(request):
     mesas = Mesa.objects.all()
@@ -15,12 +17,16 @@ def domicilio(request):
 def salon(request):
     return render(request, 'salon.html')
 
-class Productos(ListView):
+class Productos(LoginRequiredMixin, ListView):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     model = Producto
     template_name = 'Productos.html'
     context_object_name = 'Producto'
 
-class MostrarCarrito(View):
+class MostrarCarrito(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     template_name = 'carrito.html'
 
     def get(self, request):
@@ -31,7 +37,9 @@ class MostrarCarrito(View):
         context = super().get_context_data(**kwargs)
         return context
 
-class Carrito_mesa(View):
+class Carrito_mesa(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     template_name = 'carrito.html'
 
     def get(self, request, mesa_id):
@@ -67,8 +75,11 @@ class Carrito_mesa(View):
 
         return redirect('Comanda')
 
-class Carrito_domicilio (View):
+class Carrito_domicilio (LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     template_name = 'carrito.html'
+    
 
     def get(self, request):
         pedido_domicilio = PedidoDomicilio.objects.first()
@@ -106,7 +117,10 @@ class Carrito_domicilio (View):
 
         return redirect('Comanda')
 
-class EliminarProductoDelCarrito(View):
+class EliminarProductoDelCarrito(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+
     def post(self, request, carrito_item_id):
         carrito_item = get_object_or_404(CarritoItem, id=carrito_item_id)
         carrito = carrito_item.carrito
@@ -123,7 +137,10 @@ class EliminarProductoDelCarrito(View):
         
         return redirect('MostrarCarrito')
 
-class AgregarCantidadProducto(View):
+class AgregarCantidadProducto(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+
     def post(self, request, carrito_item_id):
         carrito_item = get_object_or_404(CarritoItem, id=carrito_item_id)
         nueva_cantidad = int(request.POST.get('nueva_cantidad', 1))
