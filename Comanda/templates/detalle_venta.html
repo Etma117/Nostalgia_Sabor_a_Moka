@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<h1>Detalle de Venta</h1>
+
+    <h2>Información de la Venta:</h2>
+    <p>Mesa: {{ venta.mesa.numero }}</p>
+    <p>Total: ${{ venta.total }}</p>
+    <p>Fecha: {{ venta.fecha }}</p>
+
+    <h2>Elementos del Carrito antes de Limpiar:</h2>
+    <ul>
+        {% for item in items_carrito %}
+            <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }} - Subtotal: ${{ item.subtotal }}</li>
+        {% endfor %}
+    </ul>
+
+{%endblock%}

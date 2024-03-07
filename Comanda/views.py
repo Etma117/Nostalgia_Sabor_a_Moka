@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import ListView, View
 from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
 from Menu.models import Producto
+from Venta.models import Venta, VentaItem
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 def home(request):
@@ -15,12 +18,16 @@ def domicilio(request):
 def salon(request):
     return render(request, 'salon.html')
 
-class Productos(ListView):
+class Productos(LoginRequiredMixin, ListView):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     model = Producto
     template_name = 'Productos.html'
     context_object_name = 'Producto'
 
-class MostrarCarrito(View):
+class MostrarCarrito(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     template_name = 'carrito.html'
 
     def get(self, request):
@@ -31,7 +38,9 @@ class MostrarCarrito(View):
         context = super().get_context_data(**kwargs)
         return context
 
-class Carrito_mesa(View):
+class Carrito_mesa(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
     template_name = 'carrito.html'
 
     def get(self, request, mesa_id):
@@ -65,10 +74,58 @@ class Carrito_mesa(View):
             else:
                 CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
-        return redirect('Comanda')
+        return redirect('VerComanda')
+    
+
+class LimpiarCarritoMesa(View):
+    def post(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, id=mesa_id)
+        carrito = Carrito.objects.filter(mesa=mesa).first()
+
+        if carrito:
+            # Eliminar todos los elementos del carrito
+            carrito.carritoitem_set.all().delete()
+
+        return redirect('VerComanda')
+    
+class PagarCarritoPorMesa(View):
+    template_name = 'detalle_venta.html'
+
+    def post(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, id=mesa_id)
+        carrito = Carrito.objects.filter(mesa=mesa).first()
+
+        if carrito:
+            # Obtener los elementos del carrito antes de limpiarlo
+            items_carrito = carrito.carritoitem_set.all()
+
+            # Crear una nueva venta con los datos del carrito
+            venta = Venta.objects.create(
+                mesa=mesa,
+                total=carrito.obtener_total(),
+            )
+
+            # Copiar los elementos del carrito a la venta
+            for item in items_carrito:
+                VentaItem.objects.create(
+                    venta=venta,
+                    producto=item.producto,
+                    cantidad=item.cantidad,
+                    subtotal=item.subtotal,
+                )
+
+            # Limpiar el carrito
+            carrito.carritoitem_set.all().delete()
+
+            # Renderizar una página con el detalle de la venta
+            return render(request, self.template_name, {'venta': venta, 'items_carrito': items_carrito})
+
+        return redirect('VerComanda')
+
 
 class Carrito_domicilio (View):
     template_name = 'carrito.html'
+    
 
     def get(self, request):
         pedido_domicilio = PedidoDomicilio.objects.first()
@@ -106,7 +163,10 @@ class Carrito_domicilio (View):
 
         return redirect('Comanda')
 
-class EliminarProductoDelCarrito(View):
+class EliminarProductoDelCarrito(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+
     def post(self, request, carrito_item_id):
         carrito_item = get_object_or_404(CarritoItem, id=carrito_item_id)
         carrito = carrito_item.carrito
@@ -123,7 +183,10 @@ class EliminarProductoDelCarrito(View):
         
         return redirect('MostrarCarrito')
 
-class AgregarCantidadProducto(View):
+class AgregarCantidadProducto(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+
     def post(self, request, carrito_item_id):
         carrito_item = get_object_or_404(CarritoItem, id=carrito_item_id)
         nueva_cantidad = int(request.POST.get('nueva_cantidad', 1))
@@ -137,4 +200,4 @@ class AgregarCantidadProducto(View):
         if hasattr(carrito_item, 'pedido_domicilio') and carrito_item.pedido_domicilio:
             return redirect('carrito_pedido_domicilio')
 
-        return redirect('MostrarCarrito') 
+        return redirect('VerComanda') 
