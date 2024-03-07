@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import ListView, View
 from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
 from Menu.models import Producto
+from Venta.models import Venta, VentaItem
 
 # Create your views here.
 def home(request):
@@ -66,6 +67,52 @@ class Carrito_mesa(View):
                 CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
         return redirect('Comanda')
+
+class LimpiarCarritoMesa(View):
+    def post(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, id=mesa_id)
+        carrito = Carrito.objects.filter(mesa=mesa).first()
+
+        if carrito:
+            # Eliminar todos los elementos del carrito
+            carrito.carritoitem_set.all().delete()
+
+        return redirect('VerComanda')
+    
+class PagarCarritoPorMesa(View):
+    template_name = 'detalle_venta.html'
+
+    def post(self, request, mesa_id):
+        mesa = get_object_or_404(Mesa, id=mesa_id)
+        carrito = Carrito.objects.filter(mesa=mesa).first()
+
+        if carrito:
+            # Obtener los elementos del carrito antes de limpiarlo
+            items_carrito = carrito.carritoitem_set.all()
+
+            # Crear una nueva venta con los datos del carrito
+            venta = Venta.objects.create(
+                mesa=mesa,
+                total=carrito.obtener_total(),
+            )
+
+            # Copiar los elementos del carrito a la venta
+            for item in items_carrito:
+                VentaItem.objects.create(
+                    venta=venta,
+                    producto=item.producto,
+                    cantidad=item.cantidad,
+                    subtotal=item.subtotal,
+                )
+
+            # Limpiar el carrito
+            carrito.carritoitem_set.all().delete()
+
+            # Renderizar una página con el detalle de la venta
+            return render(request, self.template_name, {'venta': venta, 'items_carrito': items_carrito})
+
+        return redirect('VerComanda')
+
 
 class Carrito_domicilio (View):
     template_name = 'carrito.html'

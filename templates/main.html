@@ -45,8 +45,17 @@
                         <a class="nav-link" href="{% url 'Comanda' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Crear Orden</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Ordenes</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'Menu'%}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Menú</a>
                     </li>
+                    
+                    {%if user.is_staff%}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Comanda' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Estadísticas</a>
+                    </li>
+                    {%endif%} 
 
                     <li class="nav-item">
                         {% if user.is_authenticated %}

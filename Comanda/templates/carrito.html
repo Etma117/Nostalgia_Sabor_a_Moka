@@ -79,7 +79,16 @@
     </tfoot>
   </table>
     
-  <button>Pagar</button>
+  <form action="{% url 'pagar_carrito_por_mesa' mesa.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Pagar</button>
+  </form>
+
+  <form action="{% url 'limpiar_carrito_por_mesa' mesa.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Limpiar Carrito</button>
+  </form>
+
   
 {% else %}
   <p>No hay productos en el carrito.</p>
