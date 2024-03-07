@@ -56,23 +56,27 @@ class Carrito_mesa(LoginRequiredMixin, View):
         return render(request, self.template_name, {'items_carrito': items_carrito, 'total': total, 'mesa': mesa, 'carrito': carrito})
 
     def post(self, request, mesa_id):
-        producto_id = request.POST.get ('id_producto')
         mesa_id = request.POST.get ('mesa_id')
         cantidad = int(request.POST.get('cantidad', 1))
 
-        producto = get_object_or_404(Producto, id=producto_id)
         mesa = get_object_or_404(Mesa, id=mesa_id)
         sabores_seleccionados = request.POST.getlist('sabores')
+        producto_ids = request.POST.getlist ('id_producto')
 
         carrito, created = Carrito.objects.get_or_create(mesa=mesa)
-        for sabor in sabores_seleccionados:
-            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+        for producto_id in producto_ids:
+            producto = get_object_or_404(Producto, id=producto_id)
+            sabores_disponibles = producto.obtener_sabores()
 
-            if carrito_item:
-                carrito_item.cantidad += cantidad
-                carrito_item.save()
-            else:
-                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+            for sabor in sabores_seleccionados:
+                if sabor in sabores_disponibles:
+                    carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+
+                    if carrito_item:
+                        carrito_item.cantidad += cantidad
+                        carrito_item.save()
+                    else:
+                        CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
         return redirect('VerComanda')
     
