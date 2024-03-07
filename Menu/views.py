@@ -3,27 +3,48 @@ from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 
 from .models import Producto, CategoriaMenu
 from .forms import ProductoForm
 
+class BuscadorYCategoriasMixin():
+     
 
-class MenuListar(ListView, LoginRequiredMixin ):
-    login_url = 'login'  
-    redirect_field_name = 'next' 
+    def get_queryset(self):
+        categoria_id = self.kwargs.get('categoria_id')
+        productos = Producto.objects.all()
 
-    model = Producto
-    template_name = 'Menu.html'
-    context_object_name = 'Producto'
+        if categoria_id:
+            productos = productos.filter(categoria=categoria_id)
+
+        busqueda = self.request.GET.get("Buscar")
+        if busqueda:
+            atributos_a_buscar = ['nombre', 'descripcion', 'precio', 'categoria__nombreCate']
+            query = Q()
+
+            for atributo in atributos_a_buscar:
+                query |= Q(**{f'{atributo}__icontains': busqueda})
+
+            productos = productos.filter(query)
+
+        return productos
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categorias'] = CategoriaMenu.objects.all()
         return context
 
+class MenuListar(LoginRequiredMixin, BuscadorYCategoriasMixin, ListView):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+
+    model = Producto
+    template_name = 'Menu.html'
+    context_object_name = 'Productos'
     
 
-class ProductoCrearView(CreateView):
+class ProductoCrearView(LoginRequiredMixin, CreateView ):
     model = Producto
     template_name = 'crear_producto.html'
     context_object_name = 'Producto'
@@ -34,7 +55,7 @@ class ProductoCrearView(CreateView):
         messages.success(self.request, 'El platillo se ha creado exitosamente.')
         return super().form_valid(form)
     
-class ProductoEditarView(UpdateView):
+class ProductoEditarView( LoginRequiredMixin, UpdateView):
     model = Producto
     template_name = 'editar_producto.html'
     context_object_name = 'Producto'
@@ -46,7 +67,7 @@ class ProductoEditarView(UpdateView):
         return super().form_valid(form)
     
 
-class ProductoEliminarView(DeleteView):
+class ProductoEliminarView(LoginRequiredMixin, DeleteView):
     model = Producto
     template_name = 'eliminar_producto.html'
     context_object_name = 'Producto'
@@ -57,7 +78,7 @@ class ProductoEliminarView(DeleteView):
         return super().form_valid(form)
 
 
-class ProductoDetalle(DetailView):
+class ProductoDetalle(LoginRequiredMixin, DetailView ):
     model = Producto
     template_name = 'producto_detalle.html'
     context_object_name = 'Producto'  # Nombre de la variable en la plantilla
