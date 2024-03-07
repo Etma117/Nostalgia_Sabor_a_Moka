@@ -74,7 +74,8 @@ class Carrito_mesa(LoginRequiredMixin, View):
             else:
                 CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
-        return redirect('Comanda')
+        return redirect('VerComanda')
+    
 
 class LimpiarCarritoMesa(View):
     def post(self, request, mesa_id):
@@ -199,4 +200,4 @@ class AgregarCantidadProducto(LoginRequiredMixin, View):
         if hasattr(carrito_item, 'pedido_domicilio') and carrito_item.pedido_domicilio:
             return redirect('carrito_pedido_domicilio')
 
-        return redirect('MostrarCarrito') 
+        return redirect('VerComanda') 
