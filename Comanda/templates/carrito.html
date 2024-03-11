@@ -83,23 +83,31 @@
   <div class="container">
     <div class="row">
         <div class="col-lg-2">
+          {% if carrito.mesa %}
             <form action="{% url 'pagar_carrito_por_mesa' mesa.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success" style="margin-top: 5px;">
                   Pagar<i class="fa-solid fa-money-bill" style= "margin-left: 5px;"></i> 
                 </button>
             </form>
+          {% else %}
+          
+          {% endif %}
         </div>
 
         <div class="col-lg-2">
-            {% if user.is_staff %}
+          {% if user.is_staff %}
+            {% if carrito.mesa %}
             <form action="{% url 'limpiar_carrito_por_mesa' mesa.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger" style="margin-top: 5px;">
                   Limpiar Carrito<i class="fa-solid fa-trash-can" style= "margin-left: 5px;"></i>
                 </button>
             </form>
+            {% else %}
+          
             {% endif %}
+          {% endif %}
         </div>
     </div>
   </div>

@@ -203,26 +203,28 @@ class Carrito_domicilio (View):
         return render(request, self.template_name, {'items_carrito': items_carrito, 'total': total, 'pedido_domicilio': pedido_domicilio, 'carrito':carrito})
 
     def post(self, request):
-        producto_id = request.POST.get ('id_producto')
         nombre = request.POST.get('nombre')
         direccion = request.POST.get('direccion')
         numero = request.POST.get('numero')
         cantidad = int(request.POST.get('cantidad', 1))
 
-        producto = get_object_or_404(Producto, id=producto_id)
-        pedido_domicilio = PedidoDomicilio.objects.first()
+        producto_ids = request.POST.getlist('id_producto')
+        pedido_domicilio, created_pedido = PedidoDomicilio.objects.get_or_create(nombre=nombre,direccion=direccion,telefono=numero)
         sabores_seleccionados = request.POST.getlist('sabores')
 
         carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
-        pedido_domicilio, created = PedidoDomicilio.objects.get_or_create(nombre=nombre, direccion=direccion, telefono=numero)
-        for sabor in sabores_seleccionados:
-            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+        for producto_id in producto_ids:
+            producto = get_object_or_404(Producto, id=producto_id)
+            sabores_disponibles = producto.sabores
+            for sabor in sabores_seleccionados:
+                if sabor in sabores_disponibles:
+                    carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
 
-            if carrito_item:
-                carrito_item.cantidad += cantidad
-                carrito_item.save()
-            else:
-                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+                    if carrito_item:
+                        carrito_item.cantidad += cantidad
+                        carrito_item.save()
+                    else:
+                        CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
         return redirect('Comanda')
 
@@ -240,8 +242,6 @@ class EliminarProductoDelCarrito(LoginRequiredMixin, View):
         
         # Ejemplo: Redirigir al carrito de domicilio
         if carrito and carrito.pedido_domicilio:
-            carrito.pedido_domicilio.delete()
-            # carrito.delete()
             return redirect('carrito_pedido_domicilio')
         
         return redirect('MostrarCarrito')
