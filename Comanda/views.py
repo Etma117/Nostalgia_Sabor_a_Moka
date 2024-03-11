@@ -1,22 +1,81 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import ListView, View
 from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
-from Menu.models import Producto
+from Menu.models import Producto, CategoriaMenu
 from Venta.models import Venta, VentaItem
+from django.db.models import Q
+
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
-def home(request):
-    mesas = Mesa.objects.all()
-    productos = Producto.objects.all()
-    return render(request, 'comanda.html', {'mesas': mesas, 'productos':productos})
+from django.http import JsonResponse
 
-def domicilio(request):
-    return render(request, 'domicilio.html')
+def buscar_productos(request):
+    query = request.GET.get('q', '')
 
-def salon(request):
-    return render(request, 'salon.html')
+    resultados = Producto.objects.filter(
+        Q(nombre__icontains=query) |
+        Q(descripcion__icontains=query) |
+        Q(sabores_raw__icontains=query) 
+    )
+
+    data = [
+        {
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'sabores': producto.obtener_sabores(),
+            'precio': float(producto.precio),
+            'categoria': producto.categoria.nombreCate if producto.categoria else None,
+            'imagen': str(producto.imagen.url) if producto.imagen else None,
+            'id': producto.id
+            
+        } for producto in resultados
+        
+    ]
+    print('Categorias', [item['categoria'] for item in data])
+    
+
+    return JsonResponse(data, safe=False)
+
+
+
+
+class BuscadorYCategoriasMixin(View):
+    def get_queryset(self):
+        categoria_id = self.kwargs.get('categoria_id')
+        productos = Producto.objects.all()
+
+        if categoria_id:
+            productos = productos.filter(categoria=categoria_id)
+
+        busqueda = self.request.GET.get("Buscar")
+        if busqueda:
+            atributos_a_buscar = ['nombre', 'descripcion', 'precio', 'categoria__nombreCate']
+            query = Q()
+
+            for atributo in atributos_a_buscar:
+                query |= Q(**{f'{atributo}__icontains': busqueda})
+
+            productos = productos.filter(query)
+
+        return productos
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categorias'] = CategoriaMenu.objects.all()
+        return context
+
+
+class HomeView(BuscadorYCategoriasMixin, ListView):
+    model = Producto
+    template_name = 'comanda.html'
+    context_object_name = 'productos'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mesas'] = Mesa.objects.all()
+        return context
 
 class Productos(LoginRequiredMixin, ListView):
     login_url = 'login'  
@@ -41,7 +100,7 @@ class MostrarCarrito(LoginRequiredMixin, View):
 class Carrito_mesa(LoginRequiredMixin, View):
     login_url = 'login'  
     redirect_field_name = 'next'
-    template_name = 'carrito.html'
+    template_name = 'carrito_mesa.html'
 
     def get(self, request, mesa_id):
         mesa = get_object_or_404(Mesa, id=mesa_id)
@@ -78,7 +137,7 @@ class Carrito_mesa(LoginRequiredMixin, View):
                     else:
                         CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
-        return redirect('VerComanda')
+        return redirect('Comanda')
     
 
 class LimpiarCarritoMesa(View):
