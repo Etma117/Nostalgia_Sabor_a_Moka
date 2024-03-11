@@ -16,7 +16,10 @@ class Producto(models.Model):
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
 
     def obtener_sabores(self):
-        return [sabor.strip() for sabor in self.sabores_raw.split(',')]
+        if self.sabores_raw:
+            return [sabor.strip() for sabor in self.sabores_raw.split(',')]
+        else:
+            return ['Ninguno']
 
     def set_sabores(self, sabores):
         self.sabores_raw = ', '.join(sabores)
