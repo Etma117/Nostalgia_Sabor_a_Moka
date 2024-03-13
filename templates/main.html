@@ -48,10 +48,13 @@
                         <a class="nav-link" href="{% url 'Dashboard' %}" style="color: #8B4513; font-size: 25px; margin-right: 40px;">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'Comanda' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Crear Orden</a>
+                        <a class="nav-link" href="{% url 'seleccionar_mesa' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Crear Orden en Sitio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Ordenes</a>
+                        <a class="nav-link" href="{% url 'HomeDomicilio' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Crear Orden a Domicilio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'VerComanda' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Ordenes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'Menu'%}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Menú</a>

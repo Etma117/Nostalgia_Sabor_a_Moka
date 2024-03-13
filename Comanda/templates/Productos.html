@@ -24,7 +24,7 @@
                     <h5 class="card-title">{{ Producto.nombre }}</h5>
                     <p class="card-text">Precio: ${{ Producto.precio }} MXN</p>
                     
-                    <form method="post" action="{% url 'añadir_producto_al_carrito' %}">
+                    <form method="post" action="#">
                         {% csrf_token %}
                         {% for sabor in Producto.sabores %}
                             <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores">
@@ -32,7 +32,6 @@
                         {% endfor %}
 
                         <input type="number" name="cantidad" style="width: 50px; height: 25px;" value="1" min="1">
-                        <input type="hidden" name="id_cliente" value="{{ user.id }}">
                         <input type="hidden" name="id_producto" value ="{{ Producto.id }}">
                         <button type="submit" class="btn btn-primary"> Añadir Producto <i class="bi bi-plus-circle-fill"></i> </button>
                     </form>

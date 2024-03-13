@@ -38,9 +38,6 @@ def buscar_productos(request):
 
     return JsonResponse(data, safe=False)
 
-
-
-
 class BuscadorYCategoriasMixin(View):
     def get_queryset(self):
         categoria_id = self.kwargs.get('categoria_id')
@@ -77,11 +74,11 @@ class HomeView(BuscadorYCategoriasMixin, ListView):
         context['mesas'] = Mesa.objects.all()
         return context
 
-class Productos(LoginRequiredMixin, ListView):
+class HomeDomicilio(LoginRequiredMixin, ListView):
     login_url = 'login'  
     redirect_field_name = 'next'
     model = Producto
-    template_name = 'Productos.html'
+    template_name = 'domicilio_comanda.html'
     context_object_name = 'Producto'
 
 class MostrarCarrito(LoginRequiredMixin, View):
@@ -100,7 +97,7 @@ class MostrarCarrito(LoginRequiredMixin, View):
 class Carrito_mesa(LoginRequiredMixin, View):
     login_url = 'login'  
     redirect_field_name = 'next'
-    template_name = 'carrito_mesa.html'
+    template_name = 'carrito.html'
 
     def get(self, request, mesa_id):
         mesa = get_object_or_404(Mesa, id=mesa_id)
@@ -115,27 +112,24 @@ class Carrito_mesa(LoginRequiredMixin, View):
         return render(request, self.template_name, {'items_carrito': items_carrito, 'total': total, 'mesa': mesa, 'carrito': carrito})
 
     def post(self, request, mesa_id):
+        producto_id =  request.POST.get('id_producto')
         mesa_id = request.POST.get ('mesa_id')
         cantidad = int(request.POST.get('cantidad', 1))
 
         mesa = get_object_or_404(Mesa, id=mesa_id)
         sabores_seleccionados = request.POST.getlist('sabores')
-        producto_ids = request.POST.getlist ('id_producto')
+        producto = get_object_or_404(Producto, id=producto_id)
 
         carrito, created = Carrito.objects.get_or_create(mesa=mesa)
-        for producto_id in producto_ids:
-            producto = get_object_or_404(Producto, id=producto_id)
-            sabores_disponibles = producto.obtener_sabores()
 
-            for sabor in sabores_seleccionados:
-                if sabor in sabores_disponibles:
-                    carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+        for sabor in sabores_seleccionados:
+            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
 
-                    if carrito_item:
-                        carrito_item.cantidad += cantidad
-                        carrito_item.save()
-                    else:
-                        CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+            if carrito_item:
+                carrito_item.cantidad += cantidad
+                carrito_item.save()
+            else:
+                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
         return redirect('Comanda')
     
@@ -189,7 +183,6 @@ class PagarCarritoPorMesa(View):
 class Carrito_domicilio (View):
     template_name = 'carrito.html'
     
-
     def get(self, request):
         pedido_domicilio = PedidoDomicilio.objects.first()
         carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
@@ -218,13 +211,13 @@ class Carrito_domicilio (View):
             sabores_disponibles = producto.sabores
             for sabor in sabores_seleccionados:
                 if sabor in sabores_disponibles:
-                    carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+                        carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
 
-                    if carrito_item:
-                        carrito_item.cantidad += cantidad
-                        carrito_item.save()
-                    else:
-                        CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+                        if carrito_item:
+                            carrito_item.cantidad += cantidad
+                            carrito_item.save()
+                        else:
+                            CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
         return redirect('Comanda')
 
@@ -264,3 +257,43 @@ class AgregarCantidadProducto(LoginRequiredMixin, View):
             return redirect('carrito_pedido_domicilio')
 
         return redirect('VerComanda') 
+    
+def SeleccionarMesa(request):
+    if request.method == 'POST':
+        mesas_seleccionadas = request.POST.getlist('mesas_seleccionadas')
+        productos = Producto.objects.all()
+        return render(request, 'comanda.html', {'mesas_seleccionadas': mesas_seleccionadas, 'productos':productos})
+    else:
+        mesas = Mesa.objects.all()
+        return render(request, 'mesas.html', {'mesas': mesas})
+
+def obtener_tu_lista_de_productos_actualizada():
+    return Producto.objects.all()
+
+def AgregarAlCarritoMesa(request):
+    if request.method == 'POST':
+        mesa_ids = request.POST.getlist('mesa_id')
+
+        for mesa_id in mesa_ids:
+            producto_id = request.POST.get(f'id_producto_{mesa_id}')
+            cantidad = int(request.POST.get(f'cantidad_{mesa_id}', 1))
+            sabores_seleccionados = request.POST.getlist(f'sabores_{mesa_id}[]')
+            mesa = get_object_or_404(Mesa, id=mesa_id)
+            producto = get_object_or_404(Producto, id=producto_id)
+
+            carrito, created = Carrito.objects.get_or_create(mesa=mesa)
+
+            for sabor in sabores_seleccionados:
+                carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+
+                if carrito_item:
+                    carrito_item.cantidad += cantidad
+                    carrito_item.save()
+                else:
+                    CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+
+        productos = obtener_tu_lista_de_productos_actualizada()
+        return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa_ids})
+
+    # Manejar el caso en que el método de solicitud no sea POST
+    return render(request, 'comanda.html')

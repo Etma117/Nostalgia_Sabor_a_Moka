@@ -1,0 +1,13 @@
+{% extends 'main.html' %}
+
+{% block contenido %}
+<form method="post" action="{% url 'seleccionar_mesa' %}">
+    {% csrf_token %}
+    {% for mesa in mesas %}
+        <input type="checkbox" name="mesas_seleccionadas" value="{{ mesa.id }}">
+        <label>Mesa {{ mesa.numero }}</label><br>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Seleccionar Mesas</button>
+</form>
+
+{% endblock %}
