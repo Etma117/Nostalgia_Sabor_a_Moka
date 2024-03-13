@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import HomeDomicilio, HomeView, Carrito_mesa, MostrarCarrito, Carrito_domicilio, EliminarProductoDelCarrito, AgregarCantidadProducto, LimpiarCarritoMesa, PagarCarritoPorMesa, AgregarAlCarritoMesa, SeleccionarMesa
+from .views import HomeDomicilio, HomeView, Carrito_mesa, MostrarCarrito, Carrito_domicilio, EliminarProductoDelCarrito, AgregarCantidadProducto, LimpiarCarritoMesa, PagarCarritoPorMesa, AgregarAlCarritoMesa, SeleccionarMesa, FormularioDomicilio, AgregarAlCarritoDomicilio
 
 urlpatterns = [
     path('', HomeView.as_view(), name= 'Comanda'),
@@ -24,5 +24,8 @@ urlpatterns = [
 
     path('agregar_por_mesa/', AgregarAlCarritoMesa , name='agregar_por_mesa'),
     path('seleccionar_mesa/', SeleccionarMesa , name='seleccionar_mesa'),
+
+    path('agregar_por_domicilio/', AgregarAlCarritoDomicilio, name='agregar_por_domicilio'),
+    path('datos_domicilio/', FormularioDomicilio, name='datos_domicilio')
 
 ]
