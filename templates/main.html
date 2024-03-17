@@ -38,20 +38,17 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light" >
         <div class="container-fluid">
             <img src = "{% static 'images/Logo.png'%}" width="120" height="120" alt="Facheritas Café" > </img>
-            <a class="navbar-brand" href="#" style="color: #8B4513; font-size: 25px;">Facheritas Café</a>
+            <a class="navbar-brand" href="{% url 'Dashboard' %}" style="color: #8B4513; font-size: 25px;">Facheritas Café</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'Dashboard' %}" style="color: #8B4513; font-size: 25px; margin-right: 40px;">Inicio</a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'seleccionar_mesa' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Orden en Sitio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'seleccionar_mesa' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Crear Orden en Sitio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'HomeDomicilio' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Crear Orden a Domicilio</a>
+                        <a class="nav-link" href="{% url 'HomeDomicilio' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Orden a Domicilio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'VerComanda' %}" style="color: #341e0e; font-size: 25px; margin-right: 40px;">Ver Ordenes</a>

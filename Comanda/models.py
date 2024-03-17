@@ -25,6 +25,7 @@ class CarritoItem(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     sabor = models.CharField(max_length=100, blank=True, null=True)
     cantidad = models.PositiveIntegerField(default=0)
+    comentario= models.CharField(max_length=500, blank= True, null=True)
 
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
 

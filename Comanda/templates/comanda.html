@@ -5,7 +5,7 @@
 <style>
   .card {
       width: 18rem;
-      height: 25rem;
+      height: 30rem;
       margin: 15px;
   }
 
@@ -32,16 +32,28 @@
 {% endblock extra_css %}
 {% block contenido %}
 
-<h1> Seleccione la mesa y los productos: </h1>
+<h1> Seleccione los platillos para la mesa {{ mesas_seleccionadas.numero }} </h1>
 
 <div id="mesasDisponibles">
-    <div class="input-group" style="margin-top: 15px">
-        <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="text" id="search-input" name="search" class="form-control" placeholder="Buscar productos">
-    </div>   
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="input-group" style="margin-top: 15px">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="search-input" name="search" class="form-control" placeholder="Buscar productos">
+            </div>
+        </div>
+        <div class="col-3">
+            <a href="" class="btn btn-success" style="margin-top: 15px; margin-bottom: 15px; background-color: #9f663e; border-color: #9f663e;">
+                <i class="fas fa-list-alt" style="margin-right: 5px"></i>Ver Orden
+            </a>
+            <a href="{% url 'Dashboard' %}" class="btn btn-outline-danger text-left" style="margin-top: 15px; margin-bottom: 15px; ">Cancelar</a>            
+        </div>  
+    </div>
+        
     <div id="productos-container" class="row">
         {% for producto in productos %}
-            <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="col-lg-3 col-md-6 col-sm-12">
                 <div class="card card-item">
                     {% if producto.imagen %}
                         <img src="{{ producto.imagen.url }}" class="card-img-top" style="width: 100%; height:200px;" alt="...">
@@ -53,17 +65,23 @@
                     <div class="card-body">
                         <form method="post" action="{% url 'agregar_por_mesa' %}">
                             {% csrf_token %}
+                            
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text">Precio: ${{ producto.precio }} MXN</p>
+
                             <input type="hidden" name="mesa_id" value="{{ mesas_seleccionadas.id }}">
                             <input type="hidden" name="id_producto_{{ mesas_seleccionadas.id }}" value="{{ producto.id }}">
 
                             <label>Sabores:</label>
+                            <br>
                             {% for sabor in producto.sabores %}
                                 <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores_{{ mesas_seleccionadas.id }}[]">
                                 <label class="form-check-label">{{ sabor }}</label><br>
                             {% endfor %}
+                            <input type="text-area" class="form-control" name="comentario_{{ mesas_seleccionadas.id }}" placeholder="Comentario Adicional">
 
                             <input class="form-control" type="number" name="cantidad_{{ mesas_seleccionadas.id }}" style="width: 65px; height: 25px; position: absolute; bottom: 10px; right: 20px;" value="1" min="1">
-                            <button type="submit" class="btn btn-primary">Agregar al Carrito <i class="bi bi-plus-circle-fill"></i></button>
+                            <button type="submit" class="btn btn-primary" style="margin-top: 5px">Agregar <i class="bi bi-plus-circle-fill"></i></button>
                         </form>
                     </div>
                 </div>
@@ -73,15 +91,13 @@
 </div>
 
 
-<a href="{% url 'Dashboard' %}" class="btn btn-danger" style="margin-top: 15px; margin-bottom: 15px;">Cancelar </a>
-
 
 {% endblock contenido%}
 
 {% block extra_js%}
 
 
-<!-- ... (Código anterior) -->
+<!-- .buscador-->
 
 <script>
     $(document).ready(function () {

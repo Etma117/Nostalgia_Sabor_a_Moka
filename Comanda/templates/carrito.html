@@ -3,21 +3,6 @@
 
 {% block contenido %}
 
-{% for mesa in mesas %}
-  <form action="{% url 'carrito_por_mesa' mesa_id=mesa.id %}" method="get">
-    <button type="submit" class="btn btn-primary" style="margin-bottom: 5px; background-color: #9f663e; border-color:  #9f663e;" title="Carrito de Mesa {{ mesa.numero }}">
-      <i class="fa-solid fa-utensils"></i> Mesa {{ mesa.numero }} 
-    </button>
-  </form>
-{% endfor %}
-
-<form action="{% url 'carrito_pedido_domicilio' %}" method="get">
-  <button type="submit" class="btn btn-primary" title="Carrito de Pedido a Domicilio" style="margin-top: 25px; background-color: #9f663e; border-color:  #9f663e;">
-    <i class="fas fa-motorcycle"></i> Pedido a Domicilio
-  </button>
-</form>
-
-
 {% if carrito %}
   {% if carrito.mesa %}
     <h2>Orden - Mesa {{ carrito.mesa.numero }} </h2>
@@ -26,11 +11,12 @@
     <h2> Para {{ carrito.pedido_domicilio.nombre}} </h2>
   {% endif %}
     
-  <table class="table table-striped">
+  <table class="table table-striped" style="boder-radius: 5px">
     <thead>
       <tr style="text-align: center;">
         <th scope="col">Producto</th>
         <th scope="col">Sabor</th>
+        <th scope="col">Coemntario Adicional</th>
         <th scope="col">Cantidad</th>
         <th scope="col">Precio Unitario</th>
         <th scope="col">Subtotal</th>
@@ -43,6 +29,7 @@
         <tr style="text-align: center;">
           <td>{{ item.producto.nombre }}</td>
           <td>{{ item.sabor }}</td>
+          <td>{{ item.comentario}}</td>
           <td>{{ item.cantidad }}</td>
           <td>${{ item.producto.precio }} MXN</td>
           <td>${{ item.subtotal }}</td>
@@ -71,8 +58,8 @@
         <td></td>
         <td></td>
         <td></td>
-        <td><strong>Total</strong></td>
-        <td>${{ total }}</td>
+        <td><strong style="font-size: 150%">Total: </strong></td>
+        <td><strong style="font-size: 150%">${{ total }}</strong></td>
         <td></td>
         <td></td>
       </tr>
@@ -82,34 +69,28 @@
 
   <div class="container">
     <div class="row">
-        <div class="col-lg-2">
+        <div class="col-2 ">
           {% if carrito.mesa %}
             <form action="{% url 'pagar_carrito_por_mesa' mesa.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success" style="margin-top: 5px;">
-                  Pagar<i class="fa-solid fa-money-bill" style= "margin-left: 5px;"></i> 
+                  <i class="fa-solid fa-money-bill" style= "margin-left: 5px;"></i> Pagar 
                 </button>
-            </form>
-          {% else %}
-          
+            </form>  
+            
+            {% if user.is_staff %}              
+              <form action="{% url 'limpiar_carrito_por_mesa' mesa.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger" style="margin-top: 15px;">
+                    <i class="fa-solid fa-trash-can" style= "margin-left: 5px;"></i> Limpiar Carrito
+                  </button>
+              </form>  
+            {% endif %}
+
           {% endif %}
         </div>
 
-        <div class="col-lg-2">
-          {% if user.is_staff %}
-            {% if carrito.mesa %}
-            <form action="{% url 'limpiar_carrito_por_mesa' mesa.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" style="margin-top: 5px;">
-                  Limpiar Carrito<i class="fa-solid fa-trash-can" style= "margin-left: 5px;"></i>
-                </button>
-            </form>
-            {% else %}
-          
-            {% endif %}
-          {% endif %}
-        </div>
-    </div>
+      </div>
   </div>
 
 
