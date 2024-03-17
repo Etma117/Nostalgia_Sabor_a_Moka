@@ -1,4 +1,8 @@
-from django.views import View
+from django.shortcuts import render
+from .models import VentaItem, Venta
 
-class Pagar(View):
-    template_name = 'venta.html'
+def Ventas(request):
+    ventas = Venta.objects.all()
+    ventaitem = VentaItem.objects.all()
+
+    return render(request, 'venta.html', {'ventas':ventas, 'ventaitem':ventaitem})

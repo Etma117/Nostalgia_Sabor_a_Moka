@@ -1,16 +1,21 @@
-<h1>Detalles de Pago</h1>
+{% extends 'main.html' %}
 
-{% for Venta in Venta %}
-<p>Fecha de venta: {{ Venta.fecha_venta }}</p>
+{% block contenido %}
+<h1>Detalles de Ventas</h1>
+
+{% for venta in ventas %}
+<h2> Venta No. {{venta.id}} </h2>
+<p>Fecha de venta: {{ venta.fecha }}</p>
 
 
 <h2>Productos comprados:</h2>   
 <ul>
-    {% for item in Venta.carrito.carritoitem_set.all %}
-        <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }} - Subtotal: {{ subtotal }}</li>
+    {% for ventaitem in venta.detalle.all %}
+    <li>{{ ventaitem.producto.nombre }} {{ ventaitem.sabor }} - Cantidad: {{ ventaitem.cantidad }} - Subtotal: {{ ventaitem.subtotal }}</li>
     {% endfor %}
 </ul>
 
-<p>Total a pagar: ${{ total }} MXN </p>
+<p>Total a pagar: ${{ venta.total }} MXN </p>
 
 {% endfor %}
+{% endblock contenido %}

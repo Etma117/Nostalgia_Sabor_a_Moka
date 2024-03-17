@@ -169,6 +169,7 @@ class PagarCarritoPorMesa(View):
                     producto=item.producto,
                     cantidad=item.cantidad,
                     subtotal=item.subtotal,
+                    sabor=item.sabor,
                 )
 
             # Limpiar el carrito
