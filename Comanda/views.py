@@ -84,7 +84,7 @@ class HomeDomicilio(LoginRequiredMixin, ListView):
 class MostrarCarrito(LoginRequiredMixin, View):
     login_url = 'login'  
     redirect_field_name = 'next'
-    template_name = 'carrito.html'
+    template_name = 'comandas.html'
 
     def get(self, request):
         mesas = Mesa.objects.all()
@@ -257,19 +257,20 @@ def AgregarAlCarritoMesa(request):
             producto_id = request.POST.get(f'id_producto_{mesa_id}')
             cantidad = int(request.POST.get(f'cantidad_{mesa_id}', 1))
             sabores_seleccionados = request.POST.getlist(f'sabores_{mesa_id}[]')
+            comentario = request.POST.get(f'comentario_{mesa_id}')
             mesa = get_object_or_404(Mesa, id=mesa_id)
             producto = get_object_or_404(Producto, id=producto_id)
 
             carrito, created = Carrito.objects.get_or_create(mesa=mesa)
 
             for sabor in sabores_seleccionados:
-                carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+                carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor, comentario=comentario)
 
                 if carrito_item:
                     carrito_item.cantidad += cantidad
                     carrito_item.save()
                 else:
-                    CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+                    CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario)
 
         productos = obtener_tu_lista_de_productos_actualizada()
         return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa_ids})
