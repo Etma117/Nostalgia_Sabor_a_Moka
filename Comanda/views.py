@@ -251,9 +251,10 @@ def obtener_tu_lista_de_productos_actualizada():
 
 def AgregarAlCarritoMesa(request):
     if request.method == 'POST':
-        mesa_ids = request.POST.getlist('mesa_id')
+        mesa_id = request.POST.get('mesa_id')
+        mesa = get_object_or_404(Mesa, id=mesa_id) 
 
-        for mesa_id in mesa_ids:
+        for mesa_id in mesa_id:
             producto_id = request.POST.get(f'id_producto_{mesa_id}')
             cantidad = int(request.POST.get(f'cantidad_{mesa_id}', 1))
             sabores_seleccionados = request.POST.getlist(f'sabores_{mesa_id}[]')
@@ -273,7 +274,7 @@ def AgregarAlCarritoMesa(request):
                     CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario)
 
         productos = obtener_tu_lista_de_productos_actualizada()
-        return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa_ids})
+        return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa})
 
     # Manejar el caso en que el método de solicitud no sea POST
     return render(request, 'comanda.html')
@@ -303,20 +304,20 @@ def AgregarAlCarritoDomicilio(request):
         producto_id = request.POST.get('id_producto')
         cantidad = int(request.POST.get('cantidad',1))
         sabores_seleccionados = request.POST.getlist('sabores')
-
+        comentario = request.POST.get('comentario')
         producto = get_object_or_404(Producto, id=producto_id)
         pedido_domicilio = get_object_or_404(PedidoDomicilio, id=pedido_domicilio_id)
 
         carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
 
         for sabor in sabores_seleccionados:
-            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor, comentario=comentario)
 
             if carrito_item:
                 carrito_item.cantidad += cantidad
                 carrito_item.save()
             else:
-                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario)
 
         productos = obtener_tu_lista_de_productos_actualizada()
         return render(request, 'productos_domicilio.html', {'productos': productos, 'id_pedido_domicilio': pedido_domicilio_id})
