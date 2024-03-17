@@ -252,12 +252,14 @@ def obtener_tu_lista_de_productos_actualizada():
 
 def AgregarAlCarritoMesa(request):
     if request.method == 'POST':
-        mesa_ids = request.POST.getlist('mesa_id')
+        mesa_ids = request.POST.get('mesa_id')
+        mesa = get_object_or_404(Mesa, id=mesa_ids)
 
         for mesa_id in mesa_ids:
             producto_id = request.POST.get(f'id_producto_{mesa_id}')
             cantidad = int(request.POST.get(f'cantidad_{mesa_id}', 1))
             sabores_seleccionados = request.POST.getlist(f'sabores_{mesa_id}[]')
+
             mesa = get_object_or_404(Mesa, id=mesa_id)
             producto = get_object_or_404(Producto, id=producto_id)
 
@@ -273,9 +275,8 @@ def AgregarAlCarritoMesa(request):
                     CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
 
         productos = obtener_tu_lista_de_productos_actualizada()
-        return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa_ids})
+        return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa})
 
-    # Manejar el caso en que el método de solicitud no sea POST
     return render(request, 'comanda.html')
 
 def FormularioDomicilio(request):

@@ -51,6 +51,8 @@
                         </div>
                     {% endif %}
                     <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text">Precio: ${{ producto.precio }} MXN</p>
                         <form method="post" action="{% url 'agregar_por_mesa' %}">
                             {% csrf_token %}
                             <input type="hidden" name="mesa_id" value="{{ mesas_seleccionadas.id }}">
