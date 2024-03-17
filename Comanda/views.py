@@ -4,7 +4,7 @@ from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
 from Menu.models import Producto, CategoriaMenu
 from Venta.models import Venta, VentaItem
 from django.db.models import Q
-
+from django.http import HttpResponseBadRequest
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -110,28 +110,6 @@ class Carrito_mesa(LoginRequiredMixin, View):
         total = sum(item.subtotal for item in items_carrito)
 
         return render(request, self.template_name, {'items_carrito': items_carrito, 'total': total, 'mesa': mesa, 'carrito': carrito})
-
-    def post(self, request, mesa_id):
-        producto_id =  request.POST.get('id_producto')
-        mesa_id = request.POST.get ('mesa_id')
-        cantidad = int(request.POST.get('cantidad', 1))
-
-        mesa = get_object_or_404(Mesa, id=mesa_id)
-        sabores_seleccionados = request.POST.getlist('sabores')
-        producto = get_object_or_404(Producto, id=producto_id)
-
-        carrito, created = Carrito.objects.get_or_create(mesa=mesa)
-
-        for sabor in sabores_seleccionados:
-            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
-
-            if carrito_item:
-                carrito_item.cantidad += cantidad
-                carrito_item.save()
-            else:
-                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
-
-        return redirect('Comanda')
     
 
 class LimpiarCarritoMesa(View):
@@ -234,7 +212,6 @@ class EliminarProductoDelCarrito(LoginRequiredMixin, View):
         if carrito and carrito.mesa:
             return redirect('carrito_por_mesa', mesa_id=carrito_item.carrito.mesa.id)
         
-        # Ejemplo: Redirigir al carrito de domicilio
         if carrito and carrito.pedido_domicilio:
             return redirect('carrito_pedido_domicilio')
         
@@ -261,9 +238,11 @@ class AgregarCantidadProducto(LoginRequiredMixin, View):
     
 def SeleccionarMesa(request):
     if request.method == 'POST':
-        mesas_seleccionadas = request.POST.getlist('mesas_seleccionadas')
-        productos = Producto.objects.all()
-        return render(request, 'comanda.html', {'mesas_seleccionadas': mesas_seleccionadas, 'productos':productos})
+        mesa_seleccionada_id = request.POST.get('mesa_seleccionada')
+        mesa = get_object_or_404(Mesa, id=mesa_seleccionada_id) 
+
+        productos = obtener_tu_lista_de_productos_actualizada()
+        return render(request, 'comanda.html', {'mesas_seleccionadas': mesa, 'productos':productos})
     else:
         mesas = Mesa.objects.all()
         return render(request, 'mesas.html', {'mesas': mesas})
@@ -298,3 +277,49 @@ def AgregarAlCarritoMesa(request):
 
     # Manejar el caso en que el método de solicitud no sea POST
     return render(request, 'comanda.html')
+
+def FormularioDomicilio(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        direccion = request.POST.get('direccion')
+        numero_telefono = request.POST.get('numero')
+        
+        pedido_domicilio = PedidoDomicilio.objects.create(
+            nombre=nombre,
+            direccion=direccion,
+            telefono=numero_telefono
+        )
+
+        id_pedido_domicilio = pedido_domicilio.id
+        productos = Producto.objects.all()
+
+        return render(request, 'productos_domicilio.html', {'id_pedido_domicilio': id_pedido_domicilio, 'productos': productos})
+
+    return render(request, 'domicilio_comanda.html')
+    
+def AgregarAlCarritoDomicilio(request):
+    if request.method == 'POST':
+        pedido_domicilio_id = request.POST.get('id_pedido_domicilio')
+        producto_id = request.POST.get('id_producto')
+        cantidad = int(request.POST.get('cantidad',1))
+        sabores_seleccionados = request.POST.getlist('sabores')
+
+        producto = get_object_or_404(Producto, id=producto_id)
+        pedido_domicilio = get_object_or_404(PedidoDomicilio, id=pedido_domicilio_id)
+
+        carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
+
+        for sabor in sabores_seleccionados:
+            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor)
+
+            if carrito_item:
+                carrito_item.cantidad += cantidad
+                carrito_item.save()
+            else:
+                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+
+        productos = obtener_tu_lista_de_productos_actualizada()
+        return render(request, 'productos_domicilio.html', {'productos': productos, 'id_pedido_domicilio': pedido_domicilio_id})
+
+    return render(request, 'productos_domicilio.html')
+

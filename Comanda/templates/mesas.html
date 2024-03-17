@@ -3,11 +3,14 @@
 {% block contenido %}
 <form method="post" action="{% url 'seleccionar_mesa' %}">
     {% csrf_token %}
-    {% for mesa in mesas %}
-        <input type="checkbox" name="mesas_seleccionadas" value="{{ mesa.id }}">
-        <label>Mesa {{ mesa.numero }}</label><br>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">Seleccionar Mesas</button>
+    <h1 for="mesa_seleccionada">Seleccione una Mesa:</h1>
+    <select id="mesa_seleccionada" name="mesa_seleccionada" class="form-select">
+        {% for mesa in mesas %}
+            <option value="{{ mesa.id }}">Mesa {{ mesa.numero }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Seleccionar Mesa</button>
 </form>
+
 
 {% endblock %}
