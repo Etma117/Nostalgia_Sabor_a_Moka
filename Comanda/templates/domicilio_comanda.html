@@ -8,15 +8,20 @@
     <h3> Añada los datos del domicilio del Cliente: </h3>
 
     <label for="Nombre">Nombre: </label>
-    <input type="text" name="nombre"/>
+    <input class="form-control" type="text" name="nombre" required />
 
     <label for="Nombre">Dirección: </label>
-    <input type="text" name="direccion"/>
+    <input class="form-control"  type="text" name="direccion" required/>
 
     <label for="Nombre">Número de Teléfono: </label>
-    <input type="tel" name="numero" id="Telephone"/>
+    <input class="form-control"  type="tel" name="numero" id="Telephone" required/>
     
-    <button type="submit" class="btn btn-primary">Guardar Datos del Pedido</button>
+    <button type="submit" class="btn btn-primary" style=" margin-top: 10px; background-color: #9f663e; border-color: #9f663e;">
+        <i class="fa-regular fa-floppy-disk"></i> Guardar Datos del Pedido
+    </button>
+    <a href="javascript:history.back();" class="btn btn-success" style=" margin-top: 10px; background-color: #9f663e; border-color: #9f663e;">
+        <i class="fas fa-arrow-left" style="margin-right: 5px"></i>Regresar
+    </a>
 </form>
 
 {% endblock contenido %}
