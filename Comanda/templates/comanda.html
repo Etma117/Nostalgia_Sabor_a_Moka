@@ -37,14 +37,23 @@
 <div id="mesasDisponibles">
 
     <div class="row">
+
         <div class="col-md-8">
-            <div class="input-group" style="margin-top: 15px">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" id="search-input" name="search" class="form-control" placeholder="Buscar productos">
-            </div>
-        </div>
-        <div class="col-3">
-            <a href="#" class="btn btn-success" style="margin-top: 15px; margin-bottom: 15px; background-color: #9f663e; border-color: #9f663e;">
+            <form method="POST" action="{% url 'buscar_productos' %}">
+                <div class="input-group" style="margin-top: 15px">
+                    {% csrf_token %}
+                    <input type="hidden" name="mesa_id" value="{{ mesas_seleccionadas.id }}">
+                    <input type="text" name="query" class="form-control" placeholder="Buscar productos...">
+                    <button type="submit" class="btn btn-primary" style="background-color: #9f663e; border-color: #9f663e;">Buscar</button>
+                </div>
+            </form>  
+        </div> 
+        
+        <div class="col-4">
+            <a href="javascript:history.back();" class="btn btn-success" style="margin-top: 15px; margin-bottom: 15px; background-color: #9f663e; border-color: #9f663e;">
+                <i class="fas fa-arrow-left" style="margin-right: 5px"></i>Regresar
+            </a>
+            <a href="{% url 'carrito_por_mesa' mesa_id=mesas_seleccionadas.id  %}" class="btn btn-success" style="margin-top: 15px; margin-bottom: 15px; background-color: #9f663e; border-color: #9f663e;">
                 <i class="fas fa-list-alt" style="margin-right: 5px"></i>Ver Orden
             </a>
             <a href="{% url 'Dashboard' %}" class="btn btn-outline-danger text-left" style="margin-top: 15px; margin-bottom: 15px; ">Cancelar</a>            
@@ -95,103 +104,6 @@
 {% endblock contenido%}
 
 {% block extra_js%}
-
-
-<!-- .buscador-->
-
-<script>
-    $(document).ready(function () {
-        $('#search-input').on('input', function () {
-            var query = $(this).val();
-
-            $.ajax({
-                url: '{% url "buscar_productos" %}',
-                data: { 'q': query },
-                dataType: 'json',
-                success: function (data) {
-                    // Limpia el contenedor de productos antes de mostrar los resultados de búsqueda
-                    $('#productos-container').empty();
-
-                    // Itera sobre los resultados y agrega cada producto al contenedor
-                    $.each(data, function (index, producto) {
-                        var cardHtml = '<div class="col-lg-4 col-md-6 col-sm-12">';
-                        cardHtml += '<div class="card card-item">';
-
-                        // Comprobación de la existencia de la imagen
-                        if (producto.imagen) {
-                            var img = new Image();
-                            img.src = producto.imagen;
-
-                            // Manejar la carga exitosa de la imagen
-                            img.onload = function () {
-                                cardHtml += '<img src="' + producto.imagen + '" class="card-img-top" style="width: 100%; height:200px;" alt="...">';
-                                cardHtml += '<div class="card-body">';
-                                cardHtml += '<h5 class="card-title">' + producto.nombre + '</h5>';
-                                cardHtml += '<p class="card-text">Precio: $' + producto.precio + ' MXN</p>';
-                                
-                                // Comprobación y generación de checkboxes para los sabores
-                                $.each(producto.sabores, function (index, sabor) {
-                                    cardHtml += '<input class="form-check-input" type="checkbox" value="' + sabor + '" name="sabores">';
-                                    cardHtml += '<label class="form-check-label">' + sabor + '</label><br>';
-                                });
-
-                                // Resto del código HTML
-                                cardHtml += '<input class="form-control" type="number" name="cantidad" style="width: 65px; height: 25px; position: absolute; bottom: 10px; right: 20px;" value="1" min="1">';
-                                cardHtml += '<input type="hidden" name="id_producto" value ="' + producto.id + '">';
-                                cardHtml += '</div></div></div>';
-                                
-                                // Agrega el HTML del producto al contenedor
-                                $('#productos-container').append(cardHtml);
-                            };
-
-                            // Manejar el caso en que la carga de la imagen falla
-                            img.onerror = function () {
-                                cardHtml += '<div class="card-placeholder" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">Sin imagen</div>';
-                                cardHtml += '<div class="card-body">';
-                                cardHtml += '<h5 class="card-title">' + producto.nombre + '</h5>';
-                                cardHtml += '<p class="card-text">Precio: $' + producto.precio + ' MXN</p>';
-                                
-                                // Comprobación y generación de checkboxes para los sabores
-                                $.each(producto.sabores, function (index, sabor) {
-                                    cardHtml += '<input class="form-check-input" type="checkbox" value="' + sabor + '" name="sabores">';
-                                    cardHtml += '<label class="form-check-label">' + sabor + '</label><br>';
-                                });
-
-                                // Resto del código HTML
-                                cardHtml += '<input class="form-control" type="number" name="cantidad" style="width: 65px; height: 25px; position: absolute; bottom: 10px; right: 20px;" value="1" min="1">';
-                                cardHtml += '<input type="hidden" name="id_producto" value ="' + producto.id + '">';
-                                cardHtml += '</div></div></div>';
-                                
-                                // Agrega el HTML del producto al contenedor
-                                $('#productos-container').append(cardHtml);
-                            };
-                        } else {
-                            cardHtml += '<div class="card-placeholder" style="width: 100%; height:200px; background-color: #eee; text-align: center; line-height: 200px;">Sin imagen</div>';
-                            cardHtml += '<div class="card-body">';
-                            cardHtml += '<h5 class="card-title">' + producto.nombre + '</h5>';
-                            cardHtml += '<p class="card-text">Precio: $' + producto.precio + ' MXN</p>';
-                            
-                            // Comprobación y generación de checkboxes para los sabores
-                            $.each(producto.sabores, function (index, sabor) {
-                                cardHtml += '<input class="form-check-input" type="checkbox" value="' + sabor + '" name="sabores">';
-                                cardHtml += '<label class="form-check-label">' + sabor + '</label><br>';
-                            });
-
-                            // Resto del código HTML
-                            cardHtml += '<input class="form-control" type="number" name="cantidad" style="width: 65px; height: 25px; position: absolute; bottom: 10px; right: 20px;" value="1" min="1">';
-                            cardHtml += '<input type="hidden" name="id_producto" value ="' + producto.id + '">';
-                            cardHtml += '</div></div></div>';
-                            
-                            // Agrega el HTML del producto al contenedor
-                            $('#productos-container').append(cardHtml);
-                        }
-                    });
-                }
-            });
-        });
-    });
-</script>
-
 
 
 {% endblock extra_js %}

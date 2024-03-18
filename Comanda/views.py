@@ -4,67 +4,12 @@ from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
 from Menu.models import Producto, CategoriaMenu
 from Venta.models import Venta, VentaItem
 from django.db.models import Q
-from django.http import HttpResponseBadRequest
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-# Create your views here.
-from django.http import JsonResponse
 
-def buscar_productos(request):
-    query = request.GET.get('q', '')
-
-    resultados = Producto.objects.filter(
-        Q(nombre__icontains=query) |
-        Q(descripcion__icontains=query) |
-        Q(sabores_raw__icontains=query) 
-    )
-
-    data = [
-        {
-            'nombre': producto.nombre,
-            'descripcion': producto.descripcion,
-            'sabores': producto.obtener_sabores(),
-            'precio': float(producto.precio),
-            'categoria': producto.categoria.nombreCate if producto.categoria else None,
-            'imagen': str(producto.imagen.url) if producto.imagen else None,
-            'id': producto.id
-            
-        } for producto in resultados
-        
-    ]
-    print('Categorias', [item['categoria'] for item in data])
-    
-
-    return JsonResponse(data, safe=False)
-
-class BuscadorYCategoriasMixin(View):
-    def get_queryset(self):
-        categoria_id = self.kwargs.get('categoria_id')
-        productos = Producto.objects.all()
-
-        if categoria_id:
-            productos = productos.filter(categoria=categoria_id)
-
-        busqueda = self.request.GET.get("Buscar")
-        if busqueda:
-            atributos_a_buscar = ['nombre', 'descripcion', 'precio', 'categoria__nombreCate']
-            query = Q()
-
-            for atributo in atributos_a_buscar:
-                query |= Q(**{f'{atributo}__icontains': busqueda})
-
-            productos = productos.filter(query)
-
-        return productos
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categorias'] = CategoriaMenu.objects.all()
-        return context
-
-
-class HomeView(BuscadorYCategoriasMixin, ListView):
+class HomeView(LoginRequiredMixin,  ListView):    
+    login_url = 'login'  
+    redirect_field_name = 'next'
     model = Producto
     template_name = 'comanda.html'
     context_object_name = 'productos'
@@ -82,17 +27,31 @@ class HomeDomicilio(LoginRequiredMixin, ListView):
     context_object_name = 'Producto'
 
 class MostrarCarrito(LoginRequiredMixin, View):
-    login_url = 'login'  
+    login_url = 'login'
     redirect_field_name = 'next'
     template_name = 'comandas.html'
 
     def get(self, request):
         mesas = Mesa.objects.all()
-        return render(request, self.template_name, {'mesas': mesas})
+        carritos_mesas = []
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+        for mesa in mesas:
+            carrito = Carrito.objects.filter(mesa=mesa).first()
+            if carrito:
+                productos_carrito = CarritoItem.objects.filter(carrito=carrito)
+                carritos_mesas.append({'mesa': mesa, 'productos_carrito': productos_carrito, 'mesa_id': mesa.id})
+
+        # Obtener los carritos de domicilio
+        pedidos_domicilio = PedidoDomicilio.objects.all()
+        carritos_domicilio = []
+
+        for pedido_domicilio in pedidos_domicilio:
+            carrito_domicilio = Carrito.objects.filter(pedido_domicilio=pedido_domicilio).first()
+            if carrito_domicilio:
+                productos_carrito_domicilio = CarritoItem.objects.filter(carrito=carrito_domicilio)
+                carritos_domicilio.append({'pedido_domicilio': pedido_domicilio, 'productos_carrito_domicilio': productos_carrito_domicilio, 'pedido_domicilio_id': pedido_domicilio.id})
+
+        return render(request, self.template_name, {'carritos_mesas': carritos_mesas, 'carritos_domicilio': carritos_domicilio})
 
 class Carrito_mesa(LoginRequiredMixin, View):
     login_url = 'login'  
@@ -248,6 +207,7 @@ def SeleccionarMesa(request):
 
 def obtener_tu_lista_de_productos_actualizada():
     return Producto.objects.all()
+    
 
 def AgregarAlCarritoMesa(request):
     if request.method == 'POST':
@@ -275,9 +235,46 @@ def AgregarAlCarritoMesa(request):
 
         productos = obtener_tu_lista_de_productos_actualizada()
         return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa})
+    
+    
+    # Manejar el caso en que el método de solicitud no sea POST
+    return render(request, 'comanda.html')
+
+def BuscarProductos(request):
+    if request.method == 'POST':
+        query = request.POST.get('query')
+        productos = Producto.objects.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
+        # Obtener la mesa seleccionada
+        mesa_id = request.POST.get('mesa_id')
+        mesa = get_object_or_404(Mesa, id=mesa_id) 
+
+        return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa})
 
     # Manejar el caso en que el método de solicitud no sea POST
     return render(request, 'comanda.html')
+
+
+
+
+
+
+class Carrito_Domicilio(LoginRequiredMixin, View):
+    login_url = 'login'  
+    redirect_field_name = 'next'
+    template_name = 'carrito.html'
+
+    def get(self, request, pedidodomicilio_id):
+        domicilio = get_object_or_404(PedidoDomicilio, id=pedidodomicilio_id)
+        carrito, created = Carrito.objects.get_or_create(pedido_domicilio=domicilio)
+        items_carrito = carrito.carritoitem_set.all()
+
+        for item in items_carrito:
+            item.subtotal = item.producto.precio * item.cantidad
+
+        total = sum(item.subtotal for item in items_carrito)
+
+        return render(request, self.template_name, {'items_carrito': items_carrito, 'total': total, 'pedido_domicilio' :domicilio, 'carrito': carrito})
+    
 
 def FormularioDomicilio(request):
     if request.method == 'POST':
@@ -320,7 +317,56 @@ def AgregarAlCarritoDomicilio(request):
                 CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario)
 
         productos = obtener_tu_lista_de_productos_actualizada()
-        return render(request, 'productos_domicilio.html', {'productos': productos, 'id_pedido_domicilio': pedido_domicilio_id})
+        return render(request, 'productos_domicilio.html', {'productos': productos, 'id_pedido_domicilio': pedido_domicilio_id, 'pedido_domicilio': pedido_domicilio})
 
     return render(request, 'productos_domicilio.html')
 
+class LimpiarCarritoDomicilio(View):
+    def post(self, request, pedidodomicilio_id):
+        domicilio = get_object_or_404(PedidoDomicilio, id=pedidodomicilio_id)
+        carrito = Carrito.objects.filter(pedido_domicilio=domicilio).first()
+
+        if carrito:
+            carrito.carritoitem_set.all().delete()
+            carrito.delete()            
+            domicilio.delete()
+
+        return redirect('VerComanda')
+    
+class PagarCarritoPorDomicilio(View):
+    template_name = 'detalle_venta_domicilio.html'
+
+    def post(self, request, domicilio_id):
+        domicilio = get_object_or_404(PedidoDomicilio, id=domicilio_id)
+        
+        carrito = Carrito.objects.filter(pedido_domicilio=domicilio).first()
+
+        if carrito:
+            # Obtener los elementos del carrito antes de limpiarlo
+            items_carrito = carrito.carritoitem_set.all()
+
+            # Crear una nueva venta con los datos del carrito
+            venta = Venta.objects.create(
+                pedido_domicilio=domicilio,
+                total=carrito.obtener_total(),
+            )
+
+            # Copiar los elementos del carrito a la venta
+            for item in items_carrito:
+                VentaItem.objects.create(
+                    venta=venta,
+                    producto=item.producto,
+                    cantidad=item.cantidad,
+                    subtotal=item.subtotal,
+                )
+
+            # Limpiar el carrito
+            carrito.carritoitem_set.all().delete()
+            carrito.delete()
+            domicilio.delete()
+
+
+            nombre_domicilio = domicilio.nombre  
+            return render(request, self.template_name, {'venta': venta, 'items_carrito': items_carrito, 'nombre_domicilio': nombre_domicilio})
+
+        return redirect('VerComanda')

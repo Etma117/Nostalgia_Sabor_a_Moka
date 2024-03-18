@@ -92,9 +92,26 @@
 
       </div>
   </div>
-
-
-
+  <div class="container">
+    <div class="row">
+        <div class="col-2">
+            {% if carrito.pedido_domicilio %}
+                <form action="{% url 'pagar_carrito_domicilio' domicilio_id=carrito.pedido_domicilio.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-success" style="margin-top: 5px;">
+                      <i class="fa-solid fa-money-bill" style= "margin-left: 5px;"></i> Pagar 
+                  </button>
+                </form>
+                <form action="{% url 'limpiar_carrito_domicilio' pedidodomicilio_id=carrito.pedido_domicilio.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger" style="margin-top: 15px;">
+                        <i class="fa-solid fa-trash-can" style="margin-left: 5px;"></i> Limpiar Carrito
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
   
 {% else %}
   

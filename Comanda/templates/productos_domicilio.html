@@ -1,9 +1,64 @@
 {% extends 'main.html'%}
+{%block extra_css%}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+<style>
+  .card {
+      width: 18rem;
+      height: 30rem;
+      margin: 15px;
+  }
+
+  @media (max-width: 1400px) {
+      .card {
+          width: calc(95%);
+      }
+  }
+
+  @media (max-width: 1200px) {
+      .card {
+          width: calc(90%); 
+      }
+  }
+
+  @media (max-width: 992px) {
+      .card {
+          width: calc(90%);
+      }
+  }
+  
+</style>
+
+{% endblock extra_css %}
 
 {% block contenido %}
+
+<h1> Seleccione los platillos para la orden a domicilio de {{ pedido_domicilio.nombre }} </h1>
+<div class="row">
+
+    <div class="col-md-8">
+        <form method="POST" action="{% url 'buscar_productos' %}">
+            <div class="input-group" style="margin-top: 15px">
+                {% csrf_token %}
+                <input type="hidden" name="mesa_id" value="{{ id_pedido_domicilio }}">
+                <input type="text" name="query" class="form-control" placeholder="Buscar productos...">
+                <button type="submit" class="btn btn-primary" style="background-color: #9f663e; border-color: #9f663e;">Buscar</button>
+            </div>
+        </form>  
+    </div> 
+    
+    <div class="col-4">
+        <a href="javascript:history.back();" class="btn btn-success" style="margin-top: 15px; margin-bottom: 15px; background-color: #9f663e; border-color: #9f663e;">
+            <i class="fas fa-arrow-left" style="margin-right: 5px"></i>Regresar
+        </a>
+        <a href="{% url 'carrito_por_domicilio' pedidodomicilio_id=id_pedido_domicilio %}" class="btn btn-success" style="margin-top: 15px; margin-bottom: 15px; background-color: #9f663e; border-color: #9f663e;">
+            <i class="fas fa-list-alt" style="margin-right: 5px"></i>Ver Orden
+        </a>
+        <a href="{% url 'Dashboard' %}" class="btn btn-outline-danger text-left" style="margin-top: 15px; margin-bottom: 15px; ">Cancelar</a>            
+    </div>  
+</div>
 <div class="row">
     {% for producto in productos %}
-        <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="col-lg-3 col-md-6 col-sm-12">
             <div class="card card-item">
                 {% if producto.imagen %}
                     <img src="{{ producto.imagen.url }}" class="card-img-top" style="width: 100%; height:200px;" alt="..." >
