@@ -30,8 +30,6 @@ urlpatterns = [
     path('Orden/', include('Comanda.urls'), name='Comanda'),
     path('Ventas/', include('Venta.urls'), name='Venta')
 
-
-
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,84 @@
+{% extends 'main.html' %}
+
+{% block contenido %}
+<div>
+    <button type="button" class="btn btn-primary" name="tipoFiltro" onclick="mostrarFecha()">
+        Filtrar por fecha
+    </button>
+    <button type="button" class="btn btn-primary" name="tipoFiltro" onclick="mostrarMes()">
+        Filtrar por Mes
+    </button>
+</div>
+
+<form method="GET">
+    <div class="input-group">
+        <div id="fecha-div" style="display: none;">
+            <label for="fecha">Seleccionar Fecha:</label>
+            <input type="date" id="fecha" class="form-control" placeholder="Seleccionar fecha" name="fecha">
+        </div>
+
+        <div id="mes-año-div" style="display: none;">
+            <label for="mes">Seleccionar Mes:</label>
+            <select name="mes" id="mes" class="form-control">
+                <option value="">---------</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+
+            <label for="año">Seleccionar Año:</label>
+            <select name="año" id="año" class="form-control">
+                <option value="">--------------</option>
+                {% for year in years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="submit">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<h1>Detalles de Ventas</h1>
+
+{% for venta in ventas %}
+<h2> Venta No. {{venta.id}} </h2>
+<p>Fecha de venta: {{ venta.fecha }}</p>
+
+
+<h2>Productos comprados:</h2>   
+<ul>
+    {% for ventaitem in venta.detalle.all %}
+    <li>{{ ventaitem.producto.nombre }} {{ ventaitem.sabor }} - Cantidad: {{ ventaitem.cantidad }} - Subtotal: {{ ventaitem.subtotal }}</li>
+    {% endfor %}
+</ul>
+
+<p>Total a pagar: ${{ venta.total }} MXN </p>
+
+{% endfor %}
+
+<p>Total de ventas: $ {{ total_ventas }} MXN</p>
+
+<script>
+    function mostrarFecha() {
+        document.getElementById("fecha-div").style.display = "block";
+        document.getElementById("mes-año-div").style.display = "none";
+    }
+    
+    function mostrarMes() {
+        document.getElementById("fecha-div").style.display = "none";
+        document.getElementById("mes-año-div").style.display = "block";
+    }
+</script>
+
+{% endblock contenido %}
