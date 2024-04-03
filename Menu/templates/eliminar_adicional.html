@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+
+{% block title %}Eliminar Adicional{% endblock %}
+
+{% block contenido %}
+<h2>Eliminar Adicional</h2>
+
+<div class="card">
+  <div class="card-body">
+    <p class="card-text">¿Estás seguro de eliminar el adicional "{{ adicional.nombre }}"?</p>
+
+    <form action="{% url 'eliminar_adicional' adicional.pk %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Eliminar</button>
+      <a href="{% url 'listar_adicionales' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

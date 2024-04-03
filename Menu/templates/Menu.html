@@ -57,6 +57,7 @@
         {%if user.is_staff%}
         <a class="btn btn-outline-secondary ms-2" href="{% url 'CrearProducto' %}" style="left: 20px; right: 20px;">Crear</a>
         {%endif%}
+        <a href="{% url 'listar_adicionales' %}" class="btn btn-outline-dark ms-2" style="left: 20px; right: 20px;">Adicionales</a>
       </div>
     </div>
   </nav>   
@@ -66,6 +67,7 @@
             <div style="display: flex;">
                 <h1>Todos los Platillos</h1>
             </div>
+            
             {% if messages %}
                 <div class="messages">
                     {% for message in messages %}

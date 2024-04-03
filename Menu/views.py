@@ -6,10 +6,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from .models import Producto, CategoriaMenu
-from .forms import ProductoForm, Adicional
+from .forms import ProductoForm, Adicional, AdicionalForm
+from django.shortcuts import get_object_or_404
 
-class BuscadorYCategoriasMixin():
-     
+class BuscadorYCategoriasMixin():     
 
     def get_queryset(self):
         categoria_id = self.kwargs.get('categoria_id')
@@ -59,7 +59,6 @@ class ProductoCrearView(LoginRequiredMixin, CreateView ):
 
                 
                 nombres = request.POST.getlist('nombre_adicional')  
-                print (nombres)
                 precios = request.POST.getlist('precio_adicional')  
 
                 for nombre, precio in zip(nombres, precios):
@@ -85,7 +84,33 @@ class ProductoEditarView( LoginRequiredMixin, UpdateView):
     context_object_name = 'Producto'
     form_class = ProductoForm
     success_url = reverse_lazy('Menu')
-    
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            producto = self.get_object()
+            current_adicionales = producto.adicionales.all()  # Get existing adicionales
+
+            nombres = request.POST.getlist('nombre_adicional')
+            precios = request.POST.getlist('precio_adicional')
+
+            for nombre, precio in zip(nombres, precios):
+                try:
+                    adicional = Adicional.objects.get(nombre=nombre)  # Check if already exists
+                except Adicional.DoesNotExist:
+                    adicional = Adicional(nombre=nombre, precio_extra=precio)
+                    adicional.save()  # Save new adicional
+
+                # Update existing relationship or create new
+                if adicional in current_adicionales:
+                    producto.adicionales.through.objects.filter(
+                        producto=producto, adicional=adicional
+                    ).update(precio_extra=precio)
+                else:
+                    producto.adicionales.add(adicional)
+
+            return redirect('Menu')
+        
     def form_valid(self, form):
         messages.success(self.request, 'El platillo se ha editado exitosamente.')
         return super().form_valid(form)
@@ -107,3 +132,36 @@ class ProductoDetalle(LoginRequiredMixin, DetailView ):
     template_name = 'producto_detalle.html'
     context_object_name = 'Producto'  # Nombre de la variable en la plantilla
     pk_url_kwarg = 'producto_id'  # Nombre del parámetro en la URL
+
+
+class AdicionalListView(ListView):
+    model = Adicional
+    template_name = 'listar_adicionales.html'
+    context_object_name = 'adicionales'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['datatables_view_name'] = 'adicionales_datatable'
+        return context
+
+class AdicionalEliminarView(LoginRequiredMixin, DeleteView):
+    model = Adicional
+    template_name = 'eliminar_adicional.html'
+    success_url = reverse_lazy('listar_adicionales')
+
+    
+
+class AdicionalCrearView(LoginRequiredMixin, CreateView):
+    model = Adicional
+    template_name = 'crear_adicional.html'
+    form_class = AdicionalForm
+    success_url = reverse_lazy('listar_adicionales')
+
+   
+
+class AdicionalEditarView(LoginRequiredMixin, UpdateView):
+    model = Adicional
+    template_name = 'editar_adicional.html'
+    form_class = AdicionalForm
+    success_url = reverse_lazy('listar_adicionales')
+

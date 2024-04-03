@@ -11,6 +11,15 @@
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
+        
+        <div id="adicionales_container"></div>
+        <button type="button" class="btn btn-primary" style="background-color: #9f663e; border-color:  #9f663e;" id="crear_adicional">
+           Agregar adicional 
+        <i class="fa-solid fa-plus"></i></button>
+        <a href="{% url 'listar_adicionales' %}" class="btn btn-primary" style="background-color: #9f663e; border-color:  #9f663e;"> 
+          Editar Adicionales <i class="fa-regular fa-pen-to-square"></i> </a>
+      
+
         <div style="margin-top: 15px;">
           <button class="btn btn-primary" type="submit">Guardar</button>
           <a href ="{% url 'Menu' %}"class="btn btn-danger" type="submit">Cancelar</a>
@@ -29,5 +38,36 @@
     </div>  
   
 </div>  
+
+<script src="https://code.jquery.com/jquery-3.6.3.min.js" ></script>
+<script>
+  $(document).ready(function() {
+    var adicional_id = 0;
+
+    $('#crear_adicional').click(function() {
+        adicional_id++;
+
+        var html = `
+            <div class="adicional" style ="bottom: 5px">
+                <label for="nombre_adicional">Nombre:</label>
+                <input type="text" name="nombre_adicional" id="nombre_adicional">
+
+                <label for="precio_adicional">Precio:</label>
+                <input type="number" name="precio_adicional" id="precio_adicional">
+
+                <button type="button" class="eliminar_adicional btn btn-outline-danger">Eliminar</button>
+            </div>
+        `;
+
+        $('#adicionales_container').append(html);
+
+        // Agregar evento para eliminar el adicional
+        $('.eliminar_adicional').click(function() {
+            $(this).parent().remove();
+        });
+    });
+
+    });
+</script>
 
 {% endblock %}

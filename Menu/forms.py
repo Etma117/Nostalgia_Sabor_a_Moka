@@ -36,7 +36,7 @@ class ProductoForm(forms.ModelForm):
             'sabores_raw': forms.TextInput(attrs={'class':'form-control'}),
             'categoria': forms.Select(attrs={'class': 'form-control'}),            
             'precio' : forms.NumberInput(attrs={'class': 'form-control'}),            
-            'imagen' : forms.ClearableFileInput(attrs={'class': 'form-control form-control-lg', 
+            'imagen' : forms.ClearableFileInput(attrs={'class': 'form-control form-control', 
                                                        'id':'formFileLg' }),
             'adicionales':forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
