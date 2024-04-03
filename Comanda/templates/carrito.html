@@ -32,7 +32,7 @@
           <td>{{ item.sabor }}</td>
           <td>
             {% if item.adicional %}
-              {{ item.adicional.nombre }} - ${{ item.adicional.precio_extra }}
+              {{ item.adicional }} - ${{ item.totalextra }}
             {% else %}
               Ningún adicional seleccionado
             {% endif %}

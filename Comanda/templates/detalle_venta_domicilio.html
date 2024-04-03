@@ -21,7 +21,7 @@
             <ul class="list-group">
                 {% for item in items_carrito %}
                     <li class="list-group-item">{{ item.producto.nombre }} {% if item.adicional %}
-                        Ingrediente adicional - {{ item.adicional.nombre }} - ${{ item.adicional.precio_extra }}
+                       Ingrediente adicional - {{ item.adicional }} - ${{ item.totalextra }}
                       {% else %}
                         Ningún adicional seleccionado
                       {% endif %} - Cantidad: {{ item.cantidad }} - Subtotal: ${{ item.subtotal }}</li>
