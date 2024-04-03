@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from .models import Producto, CategoriaMenu
-from .forms import ProductoForm
+from .forms import ProductoForm, Adicional
 
 class BuscadorYCategoriasMixin():
      
@@ -50,9 +50,33 @@ class ProductoCrearView(LoginRequiredMixin, CreateView ):
     context_object_name = 'Producto'
     form_class = ProductoForm
     success_url = reverse_lazy('Menu')
+
+    
+    def post(self, request, *args, **kwargs):
+            form = self.get_form()
+            if form.is_valid():
+                producto = form.save()  # Save the product first
+
+                
+                nombres = request.POST.getlist('nombre_adicional')  
+                print (nombres)
+                precios = request.POST.getlist('precio_adicional')  
+
+                for nombre, precio in zip(nombres, precios):
+                    adicional = Adicional(nombre=nombre, precio_extra=precio)
+                    adicional.save()  # Save the additional object first
+                    producto.adicionales.add(adicional.id)
+
+                return redirect('Menu')  # Redirect after successful save
+            else:
+                # Handle form errors
+                return render(request, self.template_name, {'form': form})
+
     
     def form_valid(self, form):
+        
         messages.success(self.request, 'El platillo se ha creado exitosamente.')
+
         return super().form_valid(form)
     
 class ProductoEditarView( LoginRequiredMixin, UpdateView):

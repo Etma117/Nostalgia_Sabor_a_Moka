@@ -1,8 +1,16 @@
-import json
-from django.contrib import admin
 from django import forms
-from django.forms import CharField
-from .models import Producto
+from django.forms import inlineformset_factory
+from .models import Producto, Adicional
+
+class AdicionalForm(forms.ModelForm):
+    class Meta:
+        model = Adicional
+        fields = ['nombre', 'precio_extra']
+        labels = {
+            'nombre': 'Nombre del Adicional',
+            'precio_extra': 'Precio Extra'
+        }
+
 
 class ProductoForm(forms.ModelForm):
     class Meta:
@@ -25,8 +33,7 @@ class ProductoForm(forms.ModelForm):
             'imagen' : forms.ClearableFileInput(attrs={'class': 'form-control form-control-lg', 
                                                        'id':'formFileLg' })
         }
-
-   
      
-class ProductoAdmin(admin.ModelAdmin):
-    form = ProductoForm
+
+    
+

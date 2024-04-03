@@ -1,31 +1,68 @@
 {% extends 'main.html' %}
 
-{% block contenido %} 
-<div class="conteiner">
-  
-    <div style="display: flex;">
-      <h1>Crear un Nuevo Platillo</h1>
-    </div>
-    <div style="margin: 15px;">
+{% block contenido %}
+<div class="container">
 
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div style="margin-top: 15px;">
-          <button class="btn btn-primary" type="submit">Guardar</button>
-          <a href ="{% url 'Menu' %}"class="btn btn-danger" type="submit">Cancelar</a> 
-        </div>
+  <div style="display: flex;">
+    <h1>Crear un Nuevo Platillo</h1>
+  </div>
+  <div style="margin: 15px;">
 
-      </form>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
 
-      {% if form.errors %}
-        <div class="errors">
-          {{ form.errors }}
-        </div>
-      {% endif %}
+      <div id="adicionales_container"></div>
+      <button type="button" id="crear_adicional">Agregar adicional</button>
 
-    </div>  
-  
-</div>  
+      <div style="margin-top: 15px;">
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <a href="{% url 'Menu' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+
+    </form>
+
+    {% if form.errors %}
+      <div class="errors">
+        {{ form.errors }}
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.3.min.js" ></script>
+
+<script>
+  $(document).ready(function() {
+    var adicional_id = 0;
+
+    $('#crear_adicional').click(function() {
+        adicional_id++;
+
+        var html = `
+            <div class="adicional">
+                <label for="nombre_adicional">Nombre:</label>
+                <input type="text" name="nombre_adicional" id="nombre_adicional">
+
+                <label for="precio_adicional">Precio:</label>
+                <input type="number" name="precio_adicional" id="precio_adicional">
+
+                <button type="button" class="eliminar_adicional">Eliminar</button>
+            </div>
+        `;
+
+        $('#adicionales_container').append(html);
+
+        // Agregar evento para eliminar el adicional
+        $('.eliminar_adicional').click(function() {
+            $(this).parent().remove();
+        });
+    });
+
+    });
+</script>
 
 {% endblock %}
+
