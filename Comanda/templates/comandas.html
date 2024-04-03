@@ -55,7 +55,7 @@
                                 </div>
                                 <div>
                                   {% if producto.adicional %}
-                                  {{ producto.adicional.nombre }} - ${{ producto.adicional.precio_extra }}
+                                    {{ producto.adicional }} - ${{ producto.totalextra }}
                                   {% else %}
                                   Ningún adicional seleccionado
                                   {% endif %}
