@@ -26,14 +26,15 @@ class CarritoItem(models.Model):
     sabor = models.CharField(max_length=100, blank=True, null=True)
     cantidad = models.PositiveIntegerField(default=0)
     comentario= models.CharField(max_length=500, blank= True, null=True)
-    adicional = models.ForeignKey(Adicional, on_delete=models.SET_NULL, blank=True, null=True)
+    adicional = models.CharField(max_length=500, blank= True, null=True)
+    totalextra = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
 
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
 
     def calcular_subtotal(self):
         subtotal = self.producto.precio * self.cantidad
         if self.adicional:
-            subtotal += self.adicional.precio_extra * self.cantidad
+            subtotal += self.totalextra * self.cantidad
         return subtotal
 
     def save(self, *args, **kwargs):
