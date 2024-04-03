@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import ListView, View
 from Comanda.models import Carrito, CarritoItem, Mesa, PedidoDomicilio
-from Menu.models import Producto, CategoriaMenu
+from Menu.models import Producto, CategoriaMenu, Adicional
 from Venta.models import Venta, VentaItem
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -64,7 +64,7 @@ class Carrito_mesa(LoginRequiredMixin, View):
         items_carrito = carrito.carritoitem_set.all()
 
         for item in items_carrito:
-            item.subtotal = item.producto.precio * item.cantidad
+            item.subtotal = item.calcular_subtotal()
 
         total = sum(item.subtotal for item in items_carrito)
 
@@ -107,6 +107,7 @@ class PagarCarritoPorMesa(View):
                     cantidad=item.cantidad,
                     subtotal=item.subtotal,
                     sabor=item.sabor,
+                    adicionales=item.adicional,
                 )
 
             # Limpiar el carrito
@@ -172,7 +173,7 @@ class EliminarProductoDelCarrito(LoginRequiredMixin, View):
             return redirect('carrito_por_mesa', mesa_id=carrito_item.carrito.mesa.id)
         
         if carrito and carrito.pedido_domicilio:
-            return redirect('carrito_pedido_domicilio')
+            return redirect('carrito_por_domicilio')
         
         return redirect('MostrarCarrito')
 
@@ -186,12 +187,11 @@ class AgregarCantidadProducto(LoginRequiredMixin, View):
         carrito_item.cantidad += nueva_cantidad
         carrito_item.save()
 
-        if hasattr(carrito_item, 'carrito') and carrito_item.carrito:
+        if carrito_item.carrito.mesa:
             return redirect('carrito_por_mesa', mesa_id=carrito_item.carrito.mesa.id)
             
-        # Ejemplo: Redirigir al carrito de domicilio
-        if hasattr(carrito_item, 'pedido_domicilio') and carrito_item.pedido_domicilio:
-            return redirect('carrito_pedido_domicilio')
+        if carrito_item.carrito.pedido_domicilio:
+            return redirect('carrito_por_domicilio', pedidodomicilio_id=carrito_item.carrito.pedido_domicilio.id)
 
         return redirect('VerComanda') 
     
@@ -220,19 +220,31 @@ def AgregarAlCarritoMesa(request):
             cantidad = int(request.POST.get(f'cantidad_{mesa_id}', 1))
             sabores_seleccionados = request.POST.getlist(f'sabores_{mesa_id}[]')
             comentario = request.POST.get(f'comentario_{mesa_id}')
+            adicionales_ids = request.POST.getlist(f'adicionales_{mesa_id}[]')
+
+            if not adicionales_ids:
+                adicionales_ids = [None]
+            
+            for adicional_id in adicionales_ids:
+                if adicional_id is not None:
+                    adicional = Adicional.objects.get(id=adicional_id)
+                else:
+                    adicional = None
+
             mesa = get_object_or_404(Mesa, id=mesa_id)
             producto = get_object_or_404(Producto, id=producto_id)
 
             carrito, created = Carrito.objects.get_or_create(mesa=mesa)
 
             for sabor in sabores_seleccionados:
-                carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor, comentario=comentario)
+
+                carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor, comentario=comentario,  adicional=adicional)
 
                 if carrito_item:
                     carrito_item.cantidad += cantidad
                     carrito_item.save()
                 else:
-                    CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario)
+                    CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario,  adicional=adicional)
 
         productos = obtener_tu_lista_de_productos_actualizada()
         return render(request, 'comanda.html', {'productos': productos, 'mesas_seleccionadas': mesa})
@@ -270,7 +282,7 @@ class Carrito_Domicilio(LoginRequiredMixin, View):
         items_carrito = carrito.carritoitem_set.all()
 
         for item in items_carrito:
-            item.subtotal = item.producto.precio * item.cantidad
+            item.subtotal = item.calcular_subtotal()
 
         total = sum(item.subtotal for item in items_carrito)
 
@@ -303,19 +315,30 @@ def AgregarAlCarritoDomicilio(request):
         cantidad = int(request.POST.get('cantidad',1))
         sabores_seleccionados = request.POST.getlist('sabores')
         comentario = request.POST.get('comentario')
+        adicional_id = request.POST.getlist('adicionales')
+
+        if not adicional_id:
+                adicional_id = [None]
+            
+        for adicional_id in adicional_id:
+            if adicional_id is not None:
+                adicional = Adicional.objects.get(id=adicional_id)
+            else:
+                adicional = None
+
         producto = get_object_or_404(Producto, id=producto_id)
         pedido_domicilio = get_object_or_404(PedidoDomicilio, id=pedido_domicilio_id)
 
         carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
 
         for sabor in sabores_seleccionados:
-            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor, comentario=comentario)
+            carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto, sabor=sabor, comentario=comentario, adicional=adicional)
 
             if carrito_item:
                 carrito_item.cantidad += cantidad
                 carrito_item.save()
             else:
-                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario)
+                CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=cantidad, comentario=comentario, adicional=adicional)
 
         productos = obtener_tu_lista_de_productos_actualizada()
         return render(request, 'productos_domicilio.html', {'productos': productos, 'id_pedido_domicilio': pedido_domicilio_id, 'pedido_domicilio': pedido_domicilio})
@@ -359,6 +382,8 @@ class PagarCarritoPorDomicilio(View):
                     producto=item.producto,
                     cantidad=item.cantidad,
                     subtotal=item.subtotal,
+                    sabor=item.sabor,
+                    adicionales=item.adicional,
                 )
 
             # Limpiar el carrito

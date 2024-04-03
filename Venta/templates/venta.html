@@ -63,7 +63,7 @@
 <h2>Productos Vendidos:</h2>   
 <ul>
     {% for ventaitem in venta.detalle.all %}
-    <li>{{ ventaitem.producto.nombre }} {{ ventaitem.sabor }} - Cantidad: {{ ventaitem.cantidad }} - Subtotal: {{ ventaitem.subtotal }}</li>
+    <li>{{ ventaitem.producto.nombre }} {{ ventaitem.sabor }} -Ingrediente extra {{ ventaitem.adicionales }} - Cantidad: {{ ventaitem.cantidad }} - Subtotal: {{ ventaitem.subtotal }}</li>
     {% endfor %}
 </ul>
 

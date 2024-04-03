@@ -20,7 +20,11 @@
             <h2>Orden Completa:</h2>
             <ul class="list-group">
                 {% for item in items_carrito %}
-                    <li class="list-group-item">{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }} - Subtotal: ${{ item.subtotal }}</li>
+                    <li class="list-group-item">{{ item.producto.nombre }} {% if item.adicional %}
+                        Ingrediente adicional - {{ item.adicional.nombre }} - ${{ item.adicional.precio_extra }}
+                      {% else %}
+                        Ningún adicional seleccionado
+                      {% endif %} - Cantidad: {{ item.cantidad }} - Subtotal: ${{ item.subtotal }}</li>
                 {% endfor %}
             </ul>
         </div>

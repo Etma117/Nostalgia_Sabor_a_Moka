@@ -87,6 +87,13 @@
                                 <input class="form-check-input" type="checkbox" value="{{ sabor }}" name="sabores_{{ mesas_seleccionadas.id }}[]">
                                 <label class="form-check-label">{{ sabor }}</label><br>
                             {% endfor %}
+                            <br>
+                            <label> Sabores Adicionales: </label>
+                            <br>
+                            {% for adicional in producto.adicionales.all %}
+                                <input class="form-checkbox-input" type="checkbox" value="{{ adicional.id }}" name="adicionales_{{ mesas_seleccionadas.id}}[]">
+                                <label class="form-check-label">{{ adicional }}</label> <br>
+                            {% endfor %}
                             <input type="text-area" class="form-control" name="comentario_{{ mesas_seleccionadas.id }}" placeholder="Comentario Adicional">
 
                             <input class="form-control" type="number" name="cantidad_{{ mesas_seleccionadas.id }}" style="width: 65px; height: 25px; position: absolute; bottom: 10px; right: 20px;" value="1" min="1">

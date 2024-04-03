@@ -14,6 +14,7 @@ class VentaItem(models.Model):
     cantidad = models.PositiveIntegerField()
     subtotal = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     sabor = models.CharField(max_length=100, blank=True, null=True)
+    adicionales = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre} - Subtotal: {self.subtotal}"

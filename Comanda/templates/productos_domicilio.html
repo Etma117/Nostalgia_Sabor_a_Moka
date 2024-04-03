@@ -81,6 +81,12 @@
                             <label class="form-check-label">{{ sabor }}</label><br>
                         {% endfor %}
 
+                        <label> Sabores Adicionales: </label>
+                        <br>
+                        {% for adicional in producto.adicionales.all %}
+                            <input class="form-checkbox-input" type="checkbox" value="{{ adicional.id }}" name="adicionales">
+                            <label class="form-check-label">{{ adicional }}</label> <br>
+                        {% endfor %}
                         <input type="number" name="cantidad" style="width: 50px; height: 25px;" value="1" min="1">
                         
                         <button type="submit" class="btn btn-primary"> Añadir Producto <i class="bi bi-plus-circle-fill"></i> </button>

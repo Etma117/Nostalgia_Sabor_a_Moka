@@ -16,6 +16,7 @@
       <tr style="text-align: center;">
         <th scope="col">Producto</th>
         <th scope="col">Sabor</th>
+        <th scope="col"> Ingrediente Adicional</th>
         <th scope="col">Comentario Adicional</th>
         <th scope="col">Cantidad</th>
         <th scope="col">Precio Unitario</th>
@@ -29,6 +30,13 @@
         <tr style="text-align: center;">
           <td>{{ item.producto.nombre }}</td>
           <td>{{ item.sabor }}</td>
+          <td>
+            {% if item.adicional %}
+              {{ item.adicional.nombre }} - ${{ item.adicional.precio_extra }}
+            {% else %}
+              Ningún adicional seleccionado
+            {% endif %}
+          </td>
           <td>{{ item.comentario}}</td>
           <td>{{ item.cantidad }}</td>
           <td>${{ item.producto.precio }} MXN</td>
