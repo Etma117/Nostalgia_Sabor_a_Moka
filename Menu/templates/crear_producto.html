@@ -13,9 +13,11 @@
       {{ form.as_p }}
 
       <div id="adicionales_container"></div>
-      <button type="button" id="crear_adicional">Agregar adicional</button>
+      <button type="button" class="btn btn-primary" style="background-color: #9f663e; border-color:  #9f663e;" id="crear_adicional">
+      Agregar adicional 
+      <i class="fa-solid fa-plus"></i></button>
 
-      <div style="margin-top: 15px;">
+      <div style="margin-top: 25px;">
         <button class="btn btn-primary" type="submit">Guardar</button>
         <a href="{% url 'Menu' %}" class="btn btn-danger">Cancelar</a>
       </div>

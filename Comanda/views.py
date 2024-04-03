@@ -50,6 +50,7 @@ class MostrarCarrito(LoginRequiredMixin, View):
             if carrito_domicilio:
                 productos_carrito_domicilio = CarritoItem.objects.filter(carrito=carrito_domicilio)
                 carritos_domicilio.append({'pedido_domicilio': pedido_domicilio, 'productos_carrito_domicilio': productos_carrito_domicilio, 'pedido_domicilio_id': pedido_domicilio.id})
+        
 
         return render(request, self.template_name, {'carritos_mesas': carritos_mesas, 'carritos_domicilio': carritos_domicilio})
 
