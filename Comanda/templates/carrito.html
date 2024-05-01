@@ -78,13 +78,20 @@
   <div class="container">
     <div class="row">
         <div class="col-2 ">
+
           {% if carrito.mesa %}
+            <form action="{% url 'seleccionar_mesa' %}" method="post" >               
+                {% csrf_token %}
+                <input type="hidden" value="{{ mesa.id }}" id="mesa_seleccionada" name="mesa_seleccionada">
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px; background-color: #9f663e; border-color: #9f663e;">Agregar más productos</button>
+              </form>
+            </div>
             <form action="{% url 'pagar_carrito_por_mesa' mesa.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success" style="margin-top: 5px;">
                   <i class="fa-solid fa-money-bill" style= "margin-left: 5px;"></i> Pagar 
                 </button>
-            </form>  
+            </form>                
             
             {% if user.is_staff %}              
               <form action="{% url 'limpiar_carrito_por_mesa' mesa.id %}" method="post">

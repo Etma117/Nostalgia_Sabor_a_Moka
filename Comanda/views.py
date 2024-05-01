@@ -127,6 +127,7 @@ class Carrito_domicilio (View):
         pedido_domicilio = PedidoDomicilio.objects.first()
         carrito, created = Carrito.objects.get_or_create(pedido_domicilio=pedido_domicilio)
         items_carrito = carrito.carritoitem_set.all()
+        
 
         for item in items_carrito:
             item.subtotal = item.producto.precio * item.cantidad

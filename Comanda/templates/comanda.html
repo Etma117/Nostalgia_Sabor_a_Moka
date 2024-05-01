@@ -111,6 +111,29 @@
 {% endblock contenido%}
 
 {% block extra_js%}
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+      // Disable buttons initially
+      $('.btn-primary').prop('disabled', true);
+    
+      // Display hover message on disabled buttons
+      $('.btn-primary[disabled]').hover(function() {
+        $(this).attr('title', 'Debe seleccionar un sabor');
+      });
+    
+      // Enable button on checkbox selection
+      $('.form-check-input').change(function() {
+        var checkboxContainer = $(this).closest('.card-body');
+        var button = checkboxContainer.find('.btn-primary');
+        if (checkboxContainer.find('.form-check-input:checked').length > 0) {
+          button.prop('disabled', false);
+        } else {
+          button.prop('disabled', true);
+          $(this).attr('title', 'Debe seleccionar un sabor'); // Add hover message here
+        }
+      });
+    });
+    </script>
 
 {% endblock extra_js %}

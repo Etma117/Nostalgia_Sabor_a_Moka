@@ -89,28 +89,30 @@ class ProductoEditarView( LoginRequiredMixin, UpdateView):
         form = self.get_form()
         if form.is_valid():
             producto = self.get_object()
-            current_adicionales = producto.adicionales.all()  # Get existing adicionales
+            current_adicionales = producto.adicionales.all()
 
-            nombres = request.POST.getlist('nombre_adicional')
-            precios = request.POST.getlist('precio_adicional')
+            # Get the selected adicionales from the form
+            selected_adicionales = set(request.POST.getlist('adicionales'))
 
-            for nombre, precio in zip(nombres, precios):
-                try:
-                    adicional = Adicional.objects.get(nombre=nombre)  # Check if already exists
-                except Adicional.DoesNotExist:
-                    adicional = Adicional(nombre=nombre, precio_extra=precio)
-                    adicional.save()  # Save new adicional
-
-                # Update existing relationship or create new
-                if adicional in current_adicionales:
-                    producto.adicionales.through.objects.filter(
-                        producto=producto, adicional=adicional
-                    ).update(precio_extra=precio)
-                else:
+            # Add any new adicionales to the product
+            for adicional_id in selected_adicionales:
+                adicional = Adicional.objects.get(pk=adicional_id)
+                if adicional not in current_adicionales:
                     producto.adicionales.add(adicional)
 
+            # Create any new adicionales that were not selected
+            for nombre, precio in zip(request.POST.getlist('nombre_adicional'), request.POST.getlist('precio_adicional')):
+                adicional = Adicional(nombre=nombre, precio_extra=precio)
+                adicional.save()
+                producto.adicionales.add(adicional)
+
+            # Remove any adicionales that are no longer selected
+            for adicional in current_adicionales:
+                if adicional.id not in selected_adicionales:
+                    producto.adicionales.remove(adicional)
+
             return redirect('Menu')
-        
+            
     def form_valid(self, form):
         messages.success(self.request, 'El platillo se ha editado exitosamente.')
         return super().form_valid(form)
